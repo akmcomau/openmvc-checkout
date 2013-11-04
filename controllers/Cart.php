@@ -2,17 +2,82 @@
 
 namespace modules\checkout\controllers;
 
+use core\classes\exceptions\RedirectException;
 use core\classes\renderable\Controller;
 use core\classes\Model;
 use core\classes\Pagination;
 use core\classes\FormValidator;
+use modules\checkout\classes\Cart as CartContents;
 
 class Cart extends Controller {
 
 	public function index() {
-		$this->language->loadLanguageFile('administrator/skeleton.php', 'core'.DS.'modules'.DS.'skeleton');
-		$template = $this->getTemplate('pages/administrator/skeleton.php', [], 'core'.DS.'modules'.DS.'skeleton');
+		$this->language->loadLanguageFile('checkout.php', 'modules'.DS.'checkout');
+		$cart = new CartContents($this->config, $this->database, $this->request);
+
+		if (isset($this->request->request_params['update-cart'])) {
+			if (is_array($this->request->requestParam('quantity'))) {
+				foreach ($this->request->requestParam('quantity') as $item => $quantity) {
+					if (preg_match('/^(\w+):(\d+)$/', $item, $matches)) {
+						$type = $matches[1];
+						$id   = $matches[2];
+						$cart->update($type, $id, $quantity);
+					}
+				}
+			}
+			if (is_array($this->request->requestParam('remove'))) {
+				foreach ($this->request->requestParam('remove') as $item) {
+					if (preg_match('/^(\w+):(\d+)$/', $item, $matches)) {
+						$type = $matches[1];
+						$id   = $matches[2];
+						$cart->remove($type, $id);
+					}
+				}
+			}
+			throw new RedirectException($this->url->getURL('Cart'));
+		}
+		elseif (isset($this->request->request_params['checkout'])) {
+			throw new RedirectException($this->url->getURL('Checkout'));
+		}
+
+		$total = 0;
+		$contents = $cart->getContents();
+		foreach ($contents as $item) {
+			$sub_total = $item->getQuantity() * $item->getPrice();
+			$item->setTotal($sub_total);
+			$total += money_format('%^!n', $sub_total);
+		}
+
+		$data = [
+			'contents' => $contents,
+			'total' => $total,
+		];
+		$template = $this->getTemplate('pages/cart.php', $data, 'modules'.DS.'checkout');
 		$this->response->setContent($template->render());
+	}
+
+	public function clear() {
+		$cart = new CartContents($this->config, $this->database, $this->request);
+		$cart->clear();
+		throw new RedirectException($this->url->getURL('Cart'));
+	}
+
+	public function add($type, $id, $quantity = 1) {
+		$cart = new CartContents($this->config, $this->database, $this->request);
+		$cart->add($type, $id, $quantity);
+		throw new RedirectException($this->url->getURL('Cart'));
+	}
+
+	public function update($type, $id, $quantity) {
+		$cart = new CartContents($this->config, $this->database, $this->request);
+		$cart->update($type, $id, $quantity);
+		throw new RedirectException($this->url->getURL('Cart'));
+	}
+
+	public function remove($type, $id) {
+		$cart = new CartContents($this->config, $this->database, $this->request);
+		$cart->remove($type, $id);
+		throw new RedirectException($this->url->getURL('Cart'));
 	}
 
 }

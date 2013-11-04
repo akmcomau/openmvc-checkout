@@ -1,7 +1,7 @@
 <?php
 
 $_LANGUAGE = [
-	'orders' => 'Orders',
+	'checkout' => 'Checkout',
 	'' => '',
 	'' => '',
 	'' => '',

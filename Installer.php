@@ -21,11 +21,6 @@ class Installer {
 	public function install() {
 		$model = new Model($this->config, $this->database);
 
-		$table = $model->getModel('\\modules\\checkout\\classes\\models\\PaymentType');
-		$table->createTable();
-		$table->createIndexes();
-		$table->createForeignKeys();
-
 		$table = $model->getModel('\\modules\\checkout\\classes\\models\\CheckoutStatus');
 		$table->createTable();
 		$table->createIndexes();
@@ -52,8 +47,6 @@ class Installer {
 		$table->dropTable();
 		$table = $model->getModel('\\modules\\checkout\\classes\\models\\CheckoutStatus');
 		$table->dropTable();
-		$table = $model->getModel('\\modules\\checkout\\classes\\models\\PaymentType');
-		$table->dropTable();
 	}
 
 	public function enable() {
@@ -61,48 +54,65 @@ class Installer {
 		$language->loadLanguageFile('administrator/checkout.php', DS.'modules'.DS.'checkout');
 
 		$layout_strings = $language->getFile('administrator/layout.php');
-		$layout_strings['checkout_module_orders'] = $language->get('orders');
+		$layout_strings['checkout_module_checkout'] = $language->get('checkout');
 		$language->updateFile('administrator/layout.php', $layout_strings);
 
 		$main_menu = new Menu($this->config, $language);
 		$main_menu->loadMenu('menu_admin_main.php');
-		$main_menu->insert_menu(['content'], 'orders', [
+		$main_menu->insert_menu(['content'], 'checkout', [
 			'controller' => 'administrator/Orders',
 			'method' => 'index',
-			'icon' => 'icon-suitcase',
-			'text_tag' => 'checkout_module_orders',
+			'icon' => 'icon-shopping-cart',
+			'text_tag' => 'checkout_module_checkout',
 			'children' => [
-				'orders_list' => [
+				'checkout_orders' => [
 					'controller' => 'administrator/Orders',
 					'method' => 'index',
-				],
-				'orders_report' => [
-					'controller' => 'administrator/Orders',
-					'method' => 'report',
+					'children' => [
+						'checkout_orders_list' => [
+							'controller' => 'administrator/Orders',
+							'method' => 'index',
+						],
+						'checkout_orders_report' => [
+							'controller' => 'administrator/Orders',
+							'method' => 'report',
+						],
+					],
 				],
 			],
 		]);
-
-
 		$main_menu->update();
+
+		// The checkout configuation, other modules can modify this config
+		$config = $this->config->getSiteConfig();
+		$config['sites'][$this->config->getSiteDomain()]['checkout'] = [
+			'tax_types' => [],
+			'shipping_methods' => [],
+			'payment_methods' => [],
+			'special_offers' => [],
+			'item_types' => [],
+		];
+		$this->config->setSiteConfig($config);
 	}
 
 	public function disable() {
 		$language = new Language($this->config);
-		$language->loadLanguageFile('administrator/block_question.php', DS.'modules'.DS.'block_question');
+		$language->loadLanguageFile('administrator/checkout.php', DS.'modules'.DS.'checkout');
 
 		$layout_strings = $language->getFile('administrator/layout.php');
-		unset($layout_strings['checkout_module_orders']);
+		unset($layout_strings['checkout_module_checkout']);
 		$language->updateFile('administrator/layout.php', $layout_strings);
 
 		// Remove some menu items to the admin menu
 		$main_menu = new Menu($this->config, $language);
 		$main_menu->loadMenu('menu_admin_main.php');
 		$menu = $main_menu->getMenuData();
-
-		unset($menu['orders']);
-
+		unset($menu['checkout']);
 		$main_menu->setMenuData($menu);
 		$main_menu->update();
+
+		$config = $this->config->getSiteConfig();
+		unset($config['sites'][$this->config->getSiteDomain()]['checkout']);
+		$this->config->setSiteConfig($config);
 	}
 }

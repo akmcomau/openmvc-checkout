@@ -18,12 +18,12 @@ class CheckoutItem extends Model {
 			'data_type'      => 'bigint',
 			'null_allowed'   => FALSE,
 		],
-		'checkout_item_model' => [
+		'checkout_item_type' => [
 			'data_type'      => 'text',
-			'data_length'    => 256,
+			'data_length'    => 32,
 			'null_allowed'   => FALSE,
 		],
-		'checkout_item_id' => [
+		'checkout_item_type_id' => [
 			'data_type'      => 'int',
 			'null_allowed'   => FALSE,
 		],
@@ -40,8 +40,8 @@ class CheckoutItem extends Model {
 
 	protected $indexes = [
 		'checkout_id',
-		'checkout_item_model',
-		'checkout_item_id',
+		'checkout_item_type',
+		'checkout_item_type_id',
 	];
 
 	protected $foreign_keys = [
