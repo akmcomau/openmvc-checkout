@@ -14,7 +14,7 @@ class Checkout extends Model {
 			'auto_increment' => TRUE,
 			'null_allowed'   => FALSE,
 		],
-		'checkout_date' => [
+		'checkout_created' => [
 			'data_type'      => 'datetime',
 			'null_allowed'   => FALSE,
 		],
@@ -31,8 +31,9 @@ class Checkout extends Model {
 			'data_length'    => 256,
 			'null_allowed'   => FALSE,
 		],
-		'payment_type_id' => [
-			'data_type'      => 'int',
+		'payment_code' => [
+			'data_type'      => 'text',
+			'data_length'    => 32,
 			'null_allowed'   => TRUE,
 		],
 		'delivery_address_id' => [
@@ -48,12 +49,17 @@ class Checkout extends Model {
 			'data_length'    => [6, 4],
 			'null_allowed'   => FALSE,
 		],
-		'checkout_postage_cost' => [
+		'checkout_amount' => [
 			'data_type'      => 'numeric',
 			'data_length'    => [6, 4],
 			'null_allowed'   => FALSE,
 		],
-		'checkout_amount' => [
+		'checkout_shipping' => [
+			'data_type'      => 'numeric',
+			'data_length'    => [6, 4],
+			'null_allowed'   => FALSE,
+		],
+		'checkout_shipping_cost' => [
 			'data_type'      => 'numeric',
 			'data_length'    => [6, 4],
 			'null_allowed'   => FALSE,
@@ -63,7 +69,7 @@ class Checkout extends Model {
 			'data_length'    => [6, 4],
 			'null_allowed'   => FALSE,
 		],
-		'checkout_postage' => [
+		'checkout_special_offers' => [
 			'data_type'      => 'numeric',
 			'data_length'    => [6, 4],
 			'null_allowed'   => FALSE,
@@ -76,17 +82,32 @@ class Checkout extends Model {
 	];
 
 	protected $indexes = [
-		'checkout_date',
+		'checkout_created',
 		'customer_id',
-		'payment_type_id',
+		'payment_code',
 		'checkout_status_id',
 	];
 
 	protected $foreign_keys = [
 		'customer_id'     => ['customer',     'customer_id'],
-		'payment_type_id' => ['payment_type', 'payment_type_id'],
 		'checkout_status_id' => ['checkout_status', 'checkout_status_id'],
 		'delivery_address_id' => ['address', 'address_id'],
 		'billing_address_id' => ['address', 'address_id'],
 	];
+
+	public function getItems() {
+		$checkout_item = $this->getModel('\modules\checkout\classes\models\CheckoutItem');
+		$items = $checkout_item->getMulti(['checkout_id' => $this->id]);
+		return $items;
+	}
+
+	public function getTotals($language) {
+		$totals = [];
+
+		// TODO Add other totals here
+
+		$totals[$language->get('total')] = $this->checkout_amount;
+
+		return $totals;
+	}
 }

@@ -2,9 +2,10 @@
 
 namespace modules\checkout\classes\models;
 
+use core\classes\exceptions\ModelException;
 use core\classes\Model;
 
-class CheckoutItem extends Model {
+class CheckoutItem extends Model implements ItemInterface {
 
 	protected $table       = 'checkout_item';
 	protected $primary_key = 'checkout_item_id';
@@ -27,7 +28,12 @@ class CheckoutItem extends Model {
 			'data_type'      => 'int',
 			'null_allowed'   => FALSE,
 		],
-		'checkout_item_price' => [
+		'checkout_item_cost_price' => [
+			'data_type'      => 'numeric',
+			'data_length'    => [6, 4],
+			'null_allowed'   => FALSE,
+		],
+		'checkout_item_sell_price' => [
 			'data_type'      => 'numeric',
 			'data_length'    => [6, 4],
 			'null_allowed'   => FALSE,
@@ -47,4 +53,69 @@ class CheckoutItem extends Model {
 	protected $foreign_keys = [
 		'checkout_id' => ['checkout', 'checkout_id'],
 	];
+
+	public function getItemType() {
+		if (isset($this->objects['item_type'])) {
+			return $this->objects['item_type'];
+		}
+
+		$type = $this->getType();
+		$item_type = $this->config->siteConfig()->checkout->item_types->$type;
+		$class = $item_type->item;
+		$object = (new $class($this->config, $this->database))->get(['id' => $this->checkout_item_type_id]);
+		$this->objects['item_type'] = $object;
+		return $object;
+	}
+
+	public function getType() {
+		return $this->checkout_item_type;
+	}
+
+	public function allowMultiple() {
+		$type = $this->getItemType();
+		return $type->allowMultiple();
+	}
+
+	public function getMaxQuantity() {
+		$type = $this->getItemType();
+		return $type->getMaxQuantity();
+	}
+
+	public function getName() {
+		$type = $this->getItemType();
+		return $type->getName();
+	}
+
+	public function getSKU() {
+		$type = $this->getItemType();
+		return $type->getSKU();
+	}
+
+	public function purchase(Checkout $checkout, CheckoutItem $item, ItemInterface $item) {
+		throw new ModelException(__METHOD__.' not allowed on CheckoutItem model');
+	}
+
+	public function getPrice() {
+		return $this->checkout_item_sell_price;
+	}
+
+	public function getCostPrice() {
+		return $this->checkout_item_cost_price;
+	}
+
+	public function setQuantity($quantity) {
+		throw new ModelException(__METHOD__.' not allowed on CheckoutItem model');
+	}
+
+	public function getQuantity() {
+		return $this->checkout_item_quantity;
+	}
+
+	public function setTotal($total) {
+		throw new ModelException(__METHOD__.' not allowed on CheckoutItem model');
+	}
+
+	public function getTotal() {
+		return $this->getQuantity() * $this->getPrice();
+	}
 }

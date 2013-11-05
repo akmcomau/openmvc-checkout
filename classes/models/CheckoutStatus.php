@@ -25,4 +25,9 @@ class CheckoutStatus extends Model {
 			'null_allowed'   => FALSE,
 		],
 	];
+
+	public function getStatusId($name) {
+		$sql = 'SELECT checkout_status_id FROM checkout_status WHERE checkout_status_name = '.$this->database->quote($name);
+		return $this->database->queryValue($sql);
+	}
 }

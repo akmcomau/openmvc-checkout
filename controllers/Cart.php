@@ -40,17 +40,9 @@ class Cart extends Controller {
 			throw new RedirectException($this->url->getURL('Checkout'));
 		}
 
-		$total = 0;
-		$contents = $cart->getContents();
-		foreach ($contents as $item) {
-			$sub_total = $item->getQuantity() * $item->getPrice();
-			$item->setTotal($sub_total);
-			$total += money_format('%^!n', $sub_total);
-		}
-
 		$data = [
-			'contents' => $contents,
-			'total' => $total,
+			'contents' => $cart->getContents(),
+			'total' => $cart->getCartTotal(),
 		];
 		$template = $this->getTemplate('pages/cart.php', $data, 'modules'.DS.'checkout');
 		$this->response->setContent($template->render());

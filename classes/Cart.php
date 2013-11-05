@@ -8,6 +8,7 @@ use core\classes\Database;
 use core\classes\Request;
 use core\classes\URL;
 use core\classes\Model;
+use core\classes\models\Customer;
 
 class Cart {
 	protected $database;
@@ -24,10 +25,24 @@ class Cart {
 		$this->request = $request;
 		$this->url = new URL($config);
 
+		$customer_id = $request->getAuthentication()->getCustomerID();
+		if ($customer_id) {
+			$model = new Model($config, $database);
+			$this->customer = $model->getModel('\core\classes\models\Customer')->get(['id' => $customer_id]);
+		}
+
 		if (!is_null($request->session->get('cart'))) {
 			$this->cart_contents = $request->session->get(['cart', 'contents']);
 			$this->cart_notes    = $request->session->get(['cart', 'notes']);
 		}
+	}
+
+	public function getCustomer() {
+		return $this->customer;
+	}
+
+	public function setCustomer(Customer $customer) {
+		$this->customer = $customer;
 	}
 
 	public function getContents() {
@@ -42,6 +57,54 @@ class Cart {
 			}
 		}
 		return $contents;
+	}
+
+	public function getCartTotal() {
+		$total = 0;
+		$contents = $this->getContents();
+		foreach ($contents as $item) {
+			$sub_total = $item->getQuantity() * $item->getPrice();
+			$item->setTotal($sub_total);
+			$total += money_format('%^!n', $sub_total);
+		}
+		return $total;
+	}
+
+	public function getCartCostPrice() {
+		$total = 0;
+		$contents = $this->getContents();
+		foreach ($contents as $item) {
+			$sub_total = $item->getQuantity() * $item->getCostPrice();
+			$item->setTotal($sub_total);
+			$total += money_format('%^!n', $sub_total);
+		}
+		return $total;
+	}
+
+	public function getTotals($language) {
+		$totals = [];
+
+		// TODO Add other totals here
+
+		$totals[$language->get('total')] = $this->getCartTotal();
+
+		return $totals;
+	}
+
+	public function getCartTax() {
+		return 0;
+	}
+
+	public function getShippingCost() {
+		return 0;
+	}
+
+	public function getShippingSell() {
+		return 0;
+	}
+
+	public function getSpecialOfferAmount() {
+		return 0;
 	}
 
 	public function getNotes() {

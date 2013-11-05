@@ -32,6 +32,11 @@ class Installer {
 		$table->createIndexes();
 		$table->createForeignKeys();
 
+		$table = $model->getModel('\\modules\\checkout\\classes\\models\\CheckoutDetail');
+		$table->createTable();
+		$table->createIndexes();
+		$table->createForeignKeys();
+
 		$table = $model->getModel('\\modules\\checkout\\classes\\models\\CheckoutItem');
 		$table->createTable();
 		$table->createIndexes();
@@ -43,6 +48,8 @@ class Installer {
 
 		$table = $model->getModel('\\modules\\checkout\\classes\\models\\CheckoutItem');
 		$table->dropTable();
+		//$table = $model->getModel('\\modules\\checkout\\classes\\models\\CheckoutDetail');
+		//$table->dropTable();
 		$table = $model->getModel('\\modules\\checkout\\classes\\models\\Checkout');
 		$table->dropTable();
 		$table = $model->getModel('\\modules\\checkout\\classes\\models\\CheckoutStatus');

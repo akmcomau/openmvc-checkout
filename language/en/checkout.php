@@ -11,4 +11,9 @@ $_LANGUAGE = [
 	'subtotal' => 'Sub-Total',
 	'update' => 'Update Cart',
 	'remove' => 'Remove',
+	'pay' => 'Continue',
+	'receipt' => 'Receipt',
+	'receipt_number' => 'Receipt Number',
+	'' => '',
+	'' => '',
 ];

@@ -9,6 +9,10 @@ class CheckoutStatus extends models\CheckoutStatus {
 	public function getRecords() {
 		return [
 			[
+				'name'        => 'Pending',
+				'description' => 'Pending payment from customer',
+			],
+			[
 				'name'        => 'Processing',
 				'description' => 'Order placed by customer',
 			],
