@@ -44,7 +44,7 @@ class Checkout extends Controller {
 
 		$data = [
 			'contents' => $checkout->getItems(),
-			'receipt_number' => Encryption::obfuscate($checkout->id, $this->config->siteConfig()->secret),
+			'receipt_number' => $checkout->getReferenceNumber(),
 			'totals' => $checkout->getTotals($this->language),
 		];
 		$template = $this->getTemplate('pages/receipt.php', $data, 'modules'.DS.'checkout');

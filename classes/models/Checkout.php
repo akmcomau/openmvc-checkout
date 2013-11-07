@@ -3,6 +3,7 @@
 namespace modules\checkout\classes\models;
 
 use core\classes\Model;
+use core\classes\Encryption;
 
 class Checkout extends Model {
 
@@ -109,5 +110,32 @@ class Checkout extends Model {
 		$totals[$language->get('total')] = $this->checkout_amount;
 
 		return $totals;
+	}
+
+	public function getReferenceNumber() {
+		return Encryption::obfuscate($this->id, $this->config->siteConfig()->secret);
+	}
+
+	public function getCustomer() {
+		if (isset($this->objects['customer'])) {
+			return $this->objects['customer'];
+		}
+
+		$this->objects['customer'] = $this->getModel('\core\classes\models\Customer')->get([
+			'id' => $this->customer_id,
+		]);
+		return $this->objects['customer'];
+	}
+
+	public function getCostPrice() {
+		return ($this->checkout_items_cost + $this->checkout_shipping_cost);
+	}
+
+	public function getSellPrice() {
+		return ($this->checkout_amount + $this->checkout_shipping);
+	}
+
+	public function getProfit() {
+		return ($this->amount + $this->shipping - $this->fees - $this->items_cost - $this->shipping_cost);
 	}
 }

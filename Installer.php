@@ -48,8 +48,8 @@ class Installer {
 
 		$table = $model->getModel('\\modules\\checkout\\classes\\models\\CheckoutItem');
 		$table->dropTable();
-		//$table = $model->getModel('\\modules\\checkout\\classes\\models\\CheckoutDetail');
-		//$table->dropTable();
+		$table = $model->getModel('\\modules\\checkout\\classes\\models\\CheckoutDetail');
+		$table->dropTable();
 		$table = $model->getModel('\\modules\\checkout\\classes\\models\\Checkout');
 		$table->dropTable();
 		$table = $model->getModel('\\modules\\checkout\\classes\\models\\CheckoutStatus');
@@ -90,6 +90,14 @@ class Installer {
 		]);
 		$main_menu->update();
 
+		$user_menu = new Menu($this->config, $language);
+		$user_menu->loadMenu('menu_public_user.php');
+		$user_menu->insert_menu(['account', 'account_password'], 'account_orders', [
+			'controller' => 'customer/Orders',
+			'method' => 'index',
+		]);
+		$user_menu->update();
+
 		// The checkout configuation, other modules can modify this config
 		$config = $this->config->getSiteConfig();
 		$config['sites'][$this->config->getSiteDomain()]['checkout'] = [
@@ -117,6 +125,13 @@ class Installer {
 		unset($menu['checkout']);
 		$main_menu->setMenuData($menu);
 		$main_menu->update();
+
+		$user_menu = new Menu($this->config, $language);
+		$user_menu->loadMenu('menu_public_user.php');
+		$menu = $user_menu->getMenuData();
+		unset($menu['account']['children']['account_orders']);
+		$user_menu->setMenuData($menu);
+		$user_menu->update();
 
 		$config = $this->config->getSiteConfig();
 		unset($config['sites'][$this->config->getSiteDomain()]['checkout']);
