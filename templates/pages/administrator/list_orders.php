@@ -1,7 +1,7 @@
 <div class="container">
 	<div class="row">
 		<div class="col-md-12">
-			<form class="admin-search-form" method="get" id="form-subscription-search">
+			<form class="admin-search-form" method="get" id="form-orders-search">
 				<div class="widget">
 					<div class="widget-header">
 						<h3><?php echo $text_search; ?></h3>
@@ -62,7 +62,7 @@
 						</div>
 						<hr class="separator-2column" />
 						<div class="align-right">
-							<button type="submit" class="btn btn-primary" name="form-subscription-search-submit"><?php echo $text_search; ?></button>
+							<button type="submit" class="btn btn-primary" name="form-orders-search-submit"><?php echo $text_search; ?></button>
 						</div>
 					</div>
 				</form>
@@ -104,7 +104,7 @@
 								<td><?php echo money_format('%n', $order->getSellPrice()); ?></td>
 								<td class="hidden-xs"><?php echo money_format('%n', $order->getProfit()); ?></td>
 								<td>
-									<a href="<?php echo $this->url->getURL('administrator/Subscriptions', 'editSubscription', [$order->id]); ?>" class="btn btn-primary"><i class="icon-edit-sign" title="<?php echo $text_edit; ?>"></i></a>
+									<a href="<?php echo $this->url->getURL('administrator/Orders', 'editOrder', [$order->id]); ?>" class="btn btn-primary"><i class="icon-edit-sign" title="<?php echo $text_edit; ?>"></i></a>
 								</td>
 							</tr>
 							<?php } ?>

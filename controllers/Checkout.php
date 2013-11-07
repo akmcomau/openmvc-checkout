@@ -36,11 +36,10 @@ class Checkout extends Controller {
 		$this->response->setContent($template->render());
 	}
 
-	public function receipt($checkout_id) {
+	public function receipt($reference) {
 		$this->language->loadLanguageFile('checkout.php', 'modules'.DS.'checkout');
 		$model = new Model($this->config, $this->database);
-		$checkout_id = Encryption::defuscate($checkout_id, $this->config->siteConfig()->secret);
-		$checkout = $model->getModel('\modules\checkout\classes\models\Checkout')->get(['id' => $checkout_id]);
+		$checkout = $model->getModel('\modules\checkout\classes\models\Checkout')->getByReference($reference);
 
 		$data = [
 			'contents' => $checkout->getItems(),

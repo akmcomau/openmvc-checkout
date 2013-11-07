@@ -79,7 +79,7 @@ class Order {
 			$address->country_id         = $australia->id;
 			$address->insert();
 		}
-		$checkout->delivery_address_id = $address->id;
+		$checkout->shipping_address_id = $address->id;
 		$checkout->billing_address_id = $address->id;
 
 		// create the checkout record

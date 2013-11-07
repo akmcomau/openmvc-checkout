@@ -37,7 +37,7 @@ class Checkout extends Model {
 			'data_length'    => 32,
 			'null_allowed'   => TRUE,
 		],
-		'delivery_address_id' => [
+		'shipping_address_id' => [
 			'data_type'      => 'bigint',
 			'null_allowed'   => FALSE,
 		],
@@ -92,9 +92,24 @@ class Checkout extends Model {
 	protected $foreign_keys = [
 		'customer_id'     => ['customer',     'customer_id'],
 		'checkout_status_id' => ['checkout_status', 'checkout_status_id'],
-		'delivery_address_id' => ['address', 'address_id'],
+		'shipping_address_id' => ['address', 'address_id'],
 		'billing_address_id' => ['address', 'address_id'],
 	];
+
+	protected $relationships = [
+		'customer' => [
+			'where_fields'  => [
+				'customer_first_name', 'customer_last_name',
+				'customer_login', 'customer_email'
+			],
+			'join_clause'   => 'JOIN customer USING (customer_id)',
+		],
+	];
+
+	public function getByReference($reference) {
+		$checkout_id = Encryption::defuscate($reference, $this->config->siteConfig()->secret);
+		return $this->getModel(__CLASS__)->get(['id' => $checkout_id]);
+	}
 
 	public function getItems() {
 		$checkout_item = $this->getModel('\modules\checkout\classes\models\CheckoutItem');
@@ -112,8 +127,24 @@ class Checkout extends Model {
 		return $totals;
 	}
 
+	public function decodeReferenceNumber($reference) {
+		return Encryption::defuscate($reference, $this->config->siteConfig()->secret);
+	}
+
 	public function getReferenceNumber() {
 		return Encryption::obfuscate($this->id, $this->config->siteConfig()->secret);
+	}
+
+	public function getCostPrice() {
+		return ($this->checkout_items_cost + $this->checkout_shipping_cost);
+	}
+
+	public function getSellPrice() {
+		return ($this->checkout_amount + $this->checkout_shipping);
+	}
+
+	public function getProfit() {
+		return ($this->amount + $this->shipping - $this->fees - $this->items_cost - $this->shipping_cost);
 	}
 
 	public function getCustomer() {
@@ -127,15 +158,44 @@ class Checkout extends Model {
 		return $this->objects['customer'];
 	}
 
-	public function getCostPrice() {
-		return ($this->checkout_items_cost + $this->checkout_shipping_cost);
+	public function getStatus() {
+		if (isset($this->objects['status'])) {
+			return $this->objects['status'];
+		}
+
+		$this->objects['status'] = $this->getModel('\modules\checkout\classes\models\CheckoutStatus')->get([
+			'id' => $this->status_id,
+		]);
+		return $this->objects['status'];
 	}
 
-	public function getSellPrice() {
-		return ($this->checkout_amount + $this->checkout_shipping);
+	public function getShippingAddress() {
+		if (is_null($this->shipping_address_id)) {
+			return NULL;
+		}
+
+		if (isset($this->objects['shipping_address'])) {
+			return $this->objects['shipping_address'];
+		}
+
+		$this->objects['shipping_address'] = $this->getModel('\core\classes\models\Address')->get([
+			'id' => $this->shipping_address_id,
+		]);
+		return $this->objects['shipping_address'];
 	}
 
-	public function getProfit() {
-		return ($this->amount + $this->shipping - $this->fees - $this->items_cost - $this->shipping_cost);
+	public function getBillingAddress() {
+		if (is_null($this->billing_address_id)) {
+			return NULL;
+		}
+
+		if (isset($this->objects['billing_address'])) {
+			return $this->objects['billing_address'];
+		}
+
+		$this->objects['billing_address'] = $this->getModel('\core\classes\models\Address')->get([
+			'id' => $this->billing_address_id,
+		]);
+		return $this->objects['billing_address'];
 	}
 }
