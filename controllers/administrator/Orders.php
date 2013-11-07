@@ -22,7 +22,7 @@ class Orders extends Controller {
 
 		$model    = new Model($this->config, $this->database);
 		$checkout = $model->getModel('\modules\checkout\classes\models\Checkout');
-		$pagination = new Pagination($this->request, 'name');
+		$pagination = new Pagination($this->request, 'created', 'desc');
 
 		$params = ['site_id' => ['type'=>'in', 'value'=>$this->allowedSiteIDs()]];
 		if ($form_search->validate()) {
@@ -65,6 +65,7 @@ class Orders extends Controller {
 		$checkout = $model->getModel('\modules\checkout\classes\models\Checkout')->get([
 			'id' => (int)$order_id,
 		]);
+		$this->siteProtection($checkout, 'getCustomer');
 
 		$data = [
 			'checkout' => $checkout,

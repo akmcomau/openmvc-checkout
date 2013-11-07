@@ -1,4 +1,5 @@
-<div class="container">
+<br />
+<div class="container page-area">
 	<h3 class="align-center">
 		<?php echo $text_receipt_number; ?>:
 		<?php echo $checkout->getReferenceNumber(); ?>
@@ -7,46 +8,36 @@
 	<form action="" method="post">
 		<div class="row">
 			<div class="col-md-6">
-				<table class="table">
+				<table class="table list">
 					<thead>
 						<tr>
-							<th colspan="4"><?php echo $text_order_details; ?></th>
+							<th colspan="2"><?php echo $text_order_details; ?></th>
 						</tr>
 					</thead>
 					<tr>
 						<th class="align-right"><?php echo $text_status; ?></th>
 						<td><?php echo $checkout->getStatus()->name; ?></td>
+					</tr>
+					<tr>
 						<th class="align-right"><?php echo $text_payment_type; ?></th>
 						<td><?php echo $checkout->payment_code; ?></td>
 					</tr>
 					<tr>
-						<th class="align-right"><?php echo $text_item_cost; ?></th>
-						<td><?php echo money_format('%n', $checkout->checkout_items_cost); ?></td>
-						<th class="align-right"><?php echo $text_items_sell; ?></th>
+						<th class="align-right"><?php echo $text_items_amount; ?></th>
 						<td><?php echo money_format('%n', $checkout->checkout_amount); ?></td>
 					</tr>
 					<tr>
-						<th class="align-right"><?php echo $text_shipping_cost; ?></th>
-						<td><?php echo money_format('%n', $checkout->checkout_shipping_cost); ?></td>
-						<th class="align-right"><?php echo $text_shipping_sell; ?></th>
+						<th class="align-right"><?php echo $text_shipping_amount; ?></th>
 						<td><?php echo money_format('%n', $checkout->checkout_shipping); ?></td>
 					</tr>
 					<tr>
 						<th class="align-right"><?php echo $text_tax; ?></th>
 						<td><?php echo money_format('%n', $checkout->checkout_tax); ?></td>
-						<th class="align-right"></th>
-						<td></td>
-					</tr>
-					<tr>
-						<th class="align-right"><?php echo $text_fees; ?></th>
-						<td><?php echo money_format('%n', $checkout->checkout_fees); ?></td>
-						<th class="align-right"><?php echo $text_profit; ?></th>
-						<td><?php echo money_format('%n', $checkout->getProfit()); ?></td>
 					</tr>
 				</table>
 			</div>
 			<div class="col-md-6">
-				<table class="table">
+				<table class="table list">
 					<thead>
 						<tr>
 							<th colspan="2"><?php echo $text_customer_details; ?></th>
@@ -110,7 +101,7 @@
 		<div class="row">
 			<?php if ($shipping) { ?>
 				<div class="col-md-6">
-					<table class="table">
+					<table class="table list">
 						<thead>
 							<tr>
 								<th colspan="2"><?php echo $text_shipping_address; ?></th>
@@ -153,7 +144,7 @@
 			<?php } ?>
 			<?php if ($billing) { ?>
 				<div class="col-md-6">
-					<table class="table">
+					<table class="table list">
 						<thead>
 							<tr>
 								<th colspan="2"><?php echo $text_billing_address; ?></th>

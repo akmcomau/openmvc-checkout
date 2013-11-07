@@ -106,15 +106,14 @@ class Checkout extends Model {
 		],
 	];
 
-	public function getByReference($reference) {
-		$checkout_id = Encryption::defuscate($reference, $this->config->siteConfig()->secret);
-		return $this->getModel(__CLASS__)->get(['id' => $checkout_id]);
-	}
-
 	public function getItems() {
 		$checkout_item = $this->getModel('\modules\checkout\classes\models\CheckoutItem');
 		$items = $checkout_item->getMulti(['checkout_id' => $this->id]);
 		return $items;
+	}
+
+	public function getTotal() {
+		return $this->checkout_amount + $this->checkout_shipping - $this->special_offers;
 	}
 
 	public function getTotals($language) {
@@ -129,6 +128,11 @@ class Checkout extends Model {
 
 	public function decodeReferenceNumber($reference) {
 		return Encryption::defuscate($reference, $this->config->siteConfig()->secret);
+	}
+
+	public function getByReference($reference) {
+		$checkout_id = $this->decodeReferenceNumber($reference);
+		return $this->getModel(__CLASS__)->get(['id' => $checkout_id]);
 	}
 
 	public function getReferenceNumber() {
