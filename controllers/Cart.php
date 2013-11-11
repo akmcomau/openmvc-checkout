@@ -34,10 +34,10 @@ class Cart extends Controller {
 					}
 				}
 			}
-			throw new RedirectException($this->url->getURL('Cart'));
+			throw new RedirectException($this->url->getUrl('Cart'));
 		}
 		elseif (isset($this->request->request_params['checkout'])) {
-			throw new RedirectException($this->url->getURL('Checkout'));
+			throw new RedirectException($this->url->getUrl('Checkout'));
 		}
 
 		$data = [
@@ -51,25 +51,25 @@ class Cart extends Controller {
 	public function clear() {
 		$cart = new CartContents($this->config, $this->database, $this->request);
 		$cart->clear();
-		throw new RedirectException($this->url->getURL('Cart'));
+		throw new RedirectException($this->url->getUrl('Cart'));
 	}
 
 	public function add($type, $id, $quantity = 1) {
 		$cart = new CartContents($this->config, $this->database, $this->request);
 		$cart->add($type, $id, $quantity);
-		throw new RedirectException($this->url->getURL('Cart'));
+		throw new RedirectException($this->url->getUrl('Cart'));
 	}
 
 	public function update($type, $id, $quantity) {
 		$cart = new CartContents($this->config, $this->database, $this->request);
 		$cart->update($type, $id, $quantity);
-		throw new RedirectException($this->url->getURL('Cart'));
+		throw new RedirectException($this->url->getUrl('Cart'));
 	}
 
 	public function remove($type, $id) {
 		$cart = new CartContents($this->config, $this->database, $this->request);
 		$cart->remove($type, $id);
-		throw new RedirectException($this->url->getURL('Cart'));
+		throw new RedirectException($this->url->getUrl('Cart'));
 	}
 
 }

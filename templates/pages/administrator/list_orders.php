@@ -80,7 +80,7 @@
 					<div class="pagination">
 						<?php echo $pagination->getPageLinks(); ?>
 					</div>
-					<form action="<?php echo $this->url->getURL('administrator/Subscriptions', 'deleteSubscription'); ?>" method="post">
+					<form action="<?php echo $this->url->getUrl('administrator/Subscriptions', 'deleteSubscription'); ?>" method="post">
 						<table class="table">
 							<tr>
 								<th nowrap="nowrap"><?php echo $text_reference; ?></th>
@@ -104,7 +104,7 @@
 								<td><?php echo money_format('%n', $order->getSellPrice()); ?></td>
 								<td class="hidden-xs"><?php echo money_format('%n', $order->getProfit()); ?></td>
 								<td>
-									<a href="<?php echo $this->url->getURL('administrator/Orders', 'editOrder', [$order->id]); ?>" class="btn btn-primary"><i class="icon-edit-sign" title="<?php echo $text_edit; ?>"></i></a>
+									<a href="<?php echo $this->url->getUrl('administrator/Orders', 'editOrder', [$order->id]); ?>" class="btn btn-primary"><i class="icon-edit-sign" title="<?php echo $text_edit; ?>"></i></a>
 								</td>
 							</tr>
 							<?php } ?>

@@ -9,7 +9,7 @@
 					<div class="pagination">
 						<?php echo $pagination->getPageLinks(); ?>
 					</div>
-					<form action="<?php echo $this->url->getURL('administrator/Subscriptions', 'deleteSubscription'); ?>" method="post">
+					<form action="<?php echo $this->url->getUrl('administrator/Subscriptions', 'deleteSubscription'); ?>" method="post">
 						<table class="table">
 							<tr>
 								<th nowrap="nowrap"><?php echo $text_reference; ?></th>
@@ -27,7 +27,7 @@
 								<td class="hidden-sm hidden-xs"><?php echo money_format('%n', $order->tax); ?></td>
 								<td><?php echo money_format('%n', $order->getTotal()); ?></td>
 								<td>
-									<a href="<?php echo $this->url->getURL('customer/Orders', 'view', [$order->getReferenceNumber()]); ?>" class="btn btn-primary" title="<?php echo $text_view; ?>"><i class="icon-edit-sign"></i></a>
+									<a href="<?php echo $this->url->getUrl('customer/Orders', 'view', [$order->getReferenceNumber()]); ?>" class="btn btn-primary" title="<?php echo $text_view; ?>"><i class="icon-edit-sign"></i></a>
 								</td>
 							</tr>
 							<?php } ?>

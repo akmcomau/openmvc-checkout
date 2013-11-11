@@ -47,7 +47,7 @@ class Orders extends Controller {
 		$model = new Model($this->config, $this->database);
 		$checkout = $model->getModel('\modules\checkout\classes\models\Checkout')->getByReference($reference);
 		if (!$checkout || $checkout->customer_id != $this->authentication->getCustomerID()) {
-			throw new RedirectException($this->getURL('administrator/Error', 'error_404'));
+			throw new RedirectException($this->getUrl('administrator/Error', 'error_404'));
 		}
 
 		$data = [
