@@ -9,6 +9,7 @@ $_LANGUAGE = [
 	'quantity' => 'Quantity',
 	'total' => 'Total',
 	'subtotal' => 'Sub-Total',
+	'subtotal' => 'Sub-Total',
 	'update' => 'Update Cart',
 	'remove' => 'Remove',
 	'pay' => 'Continue',
@@ -16,6 +17,7 @@ $_LANGUAGE = [
 	'receipt_number' => 'Receipt Number',
 	'admin_order_subject' => 'New Order',
 	'customer_order_subject' => 'Your Order Receipt',
-	'receipt_for' => 'Receipt for',
-	'order_for' => 'Order for',
+	'receipt_from' => 'Receipt from',
+	'order_from' => 'Order from',
+	'items' => 'Items',
 ];

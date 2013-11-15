@@ -107,11 +107,10 @@ class Order {
 	public function sendOrderEmails(Checkout $checkout, Language $language) {
 		$customer = $checkout->getCustomer();
 		$data = [
-			'contents' => $checkout->getItems(),
-			'receipt_number' => $checkout->getReferenceNumber(),
-			'totals' => $checkout->getTotals($language),
-			'name'  => $customer->getName(),
-			'checkout_id' => $checkout->id,
+			'checkout' => $checkout,
+			'customer' => $customer,
+			'shipping' => $checkout->getShippingAddress(),
+			'billing'  => $checkout->getBillingAddress(),
 		];
 
 		// customer
