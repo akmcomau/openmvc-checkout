@@ -14,6 +14,8 @@ $_LANGUAGE = [
 	'pay' => 'Continue',
 	'receipt' => 'Receipt',
 	'receipt_number' => 'Receipt Number',
-	'' => '',
-	'' => '',
+	'admin_order_subject' => 'New Order',
+	'customer_order_subject' => 'Your Order Receipt',
+	'receipt_for' => 'Receipt for',
+	'order_for' => 'Order for',
 ];

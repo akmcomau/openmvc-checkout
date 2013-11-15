@@ -6,7 +6,10 @@ use ErrorException;
 use core\classes\Config;
 use core\classes\Database;
 use core\classes\URL;
+use core\classes\Language;
 use core\classes\Model;
+use core\classes\Template;
+use core\classes\Email;
 use modules\checkout\classes\models\Checkout;
 use modules\checkout\classes\models\CheckoutItem;
 
@@ -99,5 +102,40 @@ class Order {
 		}
 
 		return $checkout;
+	}
+
+	public function sendOrderEmails(Checkout $checkout, Language $language) {
+		$customer = $checkout->getCustomer();
+		$data = [
+			'contents' => $checkout->getItems(),
+			'receipt_number' => $checkout->getReferenceNumber(),
+			'totals' => $checkout->getTotals($language),
+			'name'  => $customer->getName(),
+			'checkout_id' => $checkout->id,
+		];
+
+		// customer
+		$body = $this->getTemplate($language, 'emails/order_customer.txt.php', $data, 'modules'.DS.'checkout');
+		$html = $this->getTemplate($language, 'emails/order_customer.html.php', $data, 'modules'.DS.'checkout');
+		$email = new Email($this->config);
+		$email->setToEmail($customer->email);
+		$email->setSubject($language->get('customer_order_subject'));
+		$email->setBodyTemplate($body);
+		$email->setHtmlTemplate($html);
+		$email->send();
+
+		// admin
+		$body = $this->getTemplate($language, 'emails/order_admin.txt.php', $data, 'modules'.DS.'checkout');
+		$html = $this->getTemplate($language, 'emails/order_admin.html.php', $data, 'modules'.DS.'checkout');
+		$email = new Email($this->config);
+		$email->setToEmail($this->config->siteConfig()->email_addresses->orders);
+		$email->setSubject($language->get('admin_order_subject'));
+		$email->setBodyTemplate($body);
+		$email->setHtmlTemplate($html);
+		$email->send();
+	}
+
+	protected function getTemplate(Language $language, $filename, array $data = NULL, $path = NULL) {
+		return new Template($this->config, $language, $filename, $data, $path);
 	}
 }

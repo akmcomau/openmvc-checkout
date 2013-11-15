@@ -107,9 +107,13 @@ class Checkout extends Model {
 	];
 
 	public function getItems() {
+		if (array_key_exists('checkout_items', $this->objects)) {
+			return $this->objects['checkout_items'];
+		}
+
 		$checkout_item = $this->getModel('\modules\checkout\classes\models\CheckoutItem');
-		$items = $checkout_item->getMulti(['checkout_id' => $this->id]);
-		return $items;
+		$this->objects['checkout_items'] = $checkout_item->getMulti(['checkout_id' => $this->id]);
+		return $this->objects['checkout_items'];
 	}
 
 	public function getTotal() {
