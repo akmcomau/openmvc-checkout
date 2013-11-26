@@ -7,6 +7,8 @@ use core\classes\Encryption;
 
 class Checkout extends Model {
 
+	public $anonymous = FALSE;
+
 	protected $table       = 'checkout';
 	protected $primary_key = 'checkout_id';
 	protected $columns     = [

@@ -47,6 +47,7 @@ class Order {
 		// check if the customer is logged in
 		if ($this->cart->getCustomer()) {
 			$customer = $this->cart->getCustomer();
+			$was_anonymous = FALSE;
 		}
 		// else check if the email already exists, attach it to that account
 		else {
@@ -63,6 +64,7 @@ class Order {
 				$customer->site_id = $this->config->siteConfig()->site_id;
 				$customer->insert();
 			}
+			$was_anonymous = TRUE;
 		}
 
 		// check the billing address
@@ -103,6 +105,8 @@ class Order {
 		$checkout->checkout_fees            = $this->fees;
 		$checkout->checkout_tracking_number = $this->tracking_number;
 		$checkout->billing_address_id       = $billing->id;
+
+		$checkout->anonymous = $was_anonymous;
 
 		if ($this->cart->isShippable()) {
 			$checkout->shipping_address_id = $shipping->id;

@@ -80,7 +80,7 @@ class Checkout extends Controller {
 		$checkout = $model->getModel('\modules\checkout\classes\models\Checkout')->getByReference($reference);
 		$customer = $checkout->getCustomer();
 
-		$form = $this->getPaswordForm();
+		$form = $this->getPaswordForm($checkout);
 		if ($form->validate()) {
 			$customer->login = $form->getValue('username');
 			$customer->password = Encryption::bcrypt($form->getValue('password1'), $bcrypt_cost);
@@ -95,14 +95,14 @@ class Checkout extends Controller {
 			'contents' => $checkout->getItems(),
 			'receipt_number' => $checkout->getReferenceNumber(),
 			'totals' => $checkout->getTotals($this->language),
-			'created_customer' => ($customer->password == ''),
+			'created_customer' => ($this->request->session->get('anonymous_checkout_purchase') && $customer->password == ''),
 			'form' => $form,
 		];
 		$template = $this->getTemplate('pages/receipt.php', $data, 'modules'.DS.'checkout');
 		$this->response->setContent($template->render());
 	}
 
-	protected function getPaswordForm() {
+	protected function getPaswordForm($checkout) {
 		$model = new Model($this->config, $this->database);
 
 		$inputs = [
@@ -131,10 +131,10 @@ class Checkout extends Controller {
 				[
 					'type'     => 'function',
 					'message'  => $this->language->get('error_username_taken'),
-					'function' => function($value) use ($model) {
+					'function' => function($value) use ($model, $checkout) {
 						$customer = $model->getModel('core\classes\models\Customer');
 						$customer = $customer->get(['login' => $value]);
-						if ($customer) {
+						if ($customer && $customer->email != $checkout->getCustomer()->email) {
 							return FALSE;
 						}
 						else {
