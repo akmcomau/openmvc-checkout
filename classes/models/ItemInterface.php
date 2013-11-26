@@ -22,4 +22,6 @@ interface ItemInterface {
 
 	public function setTotal($total);
 	public function getTotal();
+
+	public function isShippable();
 }

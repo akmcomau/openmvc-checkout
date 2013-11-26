@@ -39,7 +39,7 @@ class Checkout extends Model {
 		],
 		'shipping_address_id' => [
 			'data_type'      => 'bigint',
-			'null_allowed'   => FALSE,
+			'null_allowed'   => TRUE,
 		],
 		'billing_address_id' => [
 			'data_type'      => 'bigint',

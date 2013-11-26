@@ -20,4 +20,10 @@ $_LANGUAGE = [
 	'receipt_from' => 'Receipt from',
 	'order_from' => 'Order from',
 	'items' => 'Items',
+	'anonymous_checkout' => 'Anonymous Checkout',
+	'dont_login_register' => 'I don\'t want to login or register',
+	'account_created' => 'Account Created',
+	'account_created_msg' => 'You can enter a username and password so you can login later and view your order history.',
+	'save' => 'Save',
+	'notification_password_error' => 'There was an error while saving your username/password',
 ];

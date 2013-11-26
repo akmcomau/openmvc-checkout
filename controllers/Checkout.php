@@ -2,6 +2,7 @@
 
 namespace modules\checkout\controllers;
 
+use core\classes\exceptions\RedirectException;
 use core\classes\exceptions\SoftRedirectException;
 use core\classes\renderable\Controller;
 use core\classes\Model;
@@ -9,15 +10,50 @@ use core\classes\Encryption;
 use core\classes\Pagination;
 use core\classes\FormValidator;
 use modules\checkout\classes\Cart as CartContents;
+use core\controllers\Customer as CustomerController;
 
 class Checkout extends Controller {
 
 	protected $permissions = [
-		'index' => ['customer'],
-		'receipt' => ['customer'],
 	];
 
-	public function index() {
+	public function index($type = NULL) {
+		$module_config = $this->config->moduleConfig('Checkout');
+		$this->language->loadLanguageFile('checkout.php', 'modules'.DS.'checkout');
+
+		// Check for an anonymous checkout or show login register page
+		$anonymous_checkout = FALSE;
+		if ($module_config->anonymous_checkout && !$this->authentication->customerLoggedIn() && $type == 'anonymous') {
+			$anonymous_checkout = TRUE;
+		}
+		elseif (!$this->authentication->customerLoggedIn()) {
+			$this->language->loadLanguageFile('customer.php');
+			$controller = new CustomerController($this->config, $this->database, $this->request, $this->response);
+			$controller->setLanguage($this->language);
+			$form_login    = $controller->getLoginForm();
+			$form_register = $controller->getRegisterForm();
+
+			$data = [
+				'login' => $form_login,
+				'register' => $form_register,
+				'controller' => 'Checkout',
+				'method' => 'index',
+				'params' => NULL,
+				'anonymous_checkout_enabled' => $module_config->anonymous_checkout,
+				'anonymous_checkout' => $anonymous_checkout,
+			];
+
+			$login_template = $this->getTemplate('pages/customer/login_form.php', $data);
+			$register_template = $this->getTemplate('pages/customer/register_form.php', $data);
+
+			$data['login_form'] = $login_template->render();
+			$data['register_form'] = $register_template->render();
+
+			$template = $this->getTemplate('pages/login_register.php', $data, 'modules'.DS.'checkout');
+			$this->response->setContent($template->render());
+			return;
+		}
+
 		if (!is_null($this->request->requestParam('payment')) && !is_null(!is_null($this->request->requestParam('payment_method')))) {
 			$code   = $this->request->requestParam('payment_method');
 			$method = $this->config->siteConfig()->checkout->payment_methods->$code;
@@ -36,18 +72,93 @@ class Checkout extends Controller {
 		$this->response->setContent($template->render());
 	}
 
-	public function receipt($reference) {
+	public function receipt($reference, $status = NULL) {
+		$bcrypt_cost = $this->config->siteConfig()->bcrypt_cost;
+		$this->language->loadLanguageFile('customer.php');
 		$this->language->loadLanguageFile('checkout.php', 'modules'.DS.'checkout');
 		$model = new Model($this->config, $this->database);
 		$checkout = $model->getModel('\modules\checkout\classes\models\Checkout')->getByReference($reference);
+		$customer = $checkout->getCustomer();
+
+		$form = $this->getPaswordForm();
+		if ($form->validate()) {
+			$customer->login = $form->getValue('username');
+			$customer->password = Encryption::bcrypt($form->getValue('password1'), $bcrypt_cost);
+			$customer->update();
+			throw new RedirectException($this->url->getUrl('Checkout', 'receipt', [$checkout->getReferenceNumber(), 'update-success']));
+		}
+		elseif ($form->isSubmitted()) {
+			$form->setNotification('error', $this->language->get('notification_password_error'));
+		}
 
 		$data = [
 			'contents' => $checkout->getItems(),
 			'receipt_number' => $checkout->getReferenceNumber(),
 			'totals' => $checkout->getTotals($this->language),
+			'created_customer' => ($customer->password == ''),
+			'form' => $form,
 		];
 		$template = $this->getTemplate('pages/receipt.php', $data, 'modules'.DS.'checkout');
 		$this->response->setContent($template->render());
+	}
+
+	protected function getPaswordForm() {
+		$model = new Model($this->config, $this->database);
+
+		$inputs = [
+			'username' => [
+				'type' => 'string',
+				'min_length' => 6,
+				'max_length' => 32,
+				'message' => $this->language->get('error_username')
+			],
+			'password1' => [
+				'type' => 'string',
+				'min_length' => 6,
+				'max_length' => 32,
+				'message' => $this->language->get('error_password')
+			],
+			'password2' => [
+				'type' => 'string',
+				'min_length' => 6,
+				'max_length' => 32,
+				'message' => $this->language->get('error_password')
+			]
+		];
+
+		$validators = [
+			'username' => [
+				[
+					'type'     => 'function',
+					'message'  => $this->language->get('error_username_taken'),
+					'function' => function($value) use ($model) {
+						$customer = $model->getModel('core\classes\models\Customer');
+						$customer = $customer->get(['login' => $value]);
+						if ($customer) {
+							return FALSE;
+						}
+						else {
+							return TRUE;
+						}
+					}
+				],
+			],
+			'password1' => [
+				[
+					'type'    => 'params-equal',
+					'param'   => 'password2',
+					'message' => $this->language->get('error_password_mismatch'),
+				],
+				[
+					'type'      => 'regex',
+					'regex'     => '\d',
+					'modifiers' => '',
+					'message'   => $this->language->get('error_password_number'),
+				],
+			],
+		];
+
+		return new FormValidator($this->request, 'form-password', $inputs, $validators);
 	}
 
 }

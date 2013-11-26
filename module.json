@@ -11,5 +11,6 @@
 		"administrator\\Orders"
 	],
 	"default_config": {
+		"anonymous_checkout": true
 	}
 }

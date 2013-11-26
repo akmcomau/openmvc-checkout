@@ -101,50 +101,8 @@
 </div>
 <div>
 <table style="width: 100%;"><tr><td>
-<?php if ($shipping) { ?>
-<table style="background-color: #FFF;width: 100%;padding: 20px;">
-<thead>
-<tr>
-<th colspan="2" style="text-align: left;"><?php echo $text_shipping_address; ?></th>
-</tr>
-</thead>
-<tr>
-<th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_first_name; ?>: </th>
-<td style="border-top: 1px solid #ddd;"><?php echo $shipping->first_name; ?></td>
-</tr>
-<tr>
-<th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_last_name; ?>: </th>
-<td style="border-top: 1px solid #ddd;"><?php echo $shipping->last_name; ?></td>
-</tr>
-<tr>
-<th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_address1; ?>: </th>
-<td style="border-top: 1px solid #ddd;"><?php echo $shipping->address_line1; ?></td>
-</tr>
-<tr>
-<th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_address2; ?>: </th>
-<td style="border-top: 1px solid #ddd;"><?php echo $shipping->address_line2; ?>&nbsp;</td>
-</tr>
-<tr>
-<th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_postcode; ?>: </th>
-<td style="border-top: 1px solid #ddd;"><?php echo $shipping->address_postcode; ?></td>
-</tr>
-<tr>
-<th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_city; ?>: </th>
-<td style="border-top: 1px solid #ddd;"><?php echo $shipping->getCity()->name; ?></td>
-</tr>
-<tr>
-<th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_state; ?>: </th>
-<td style="border-top: 1px solid #ddd;"><?php echo $shipping->getState()->name; ?></td>
-</tr>
-<tr>
-<th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_country; ?>: </th>
-<td style="border-top: 1px solid #ddd;"><?php echo $shipping->getCountry()->name; ?></td>
-</tr>
-</table>
-<?php } ?>
-</td><td>
 <?php if ($billing) { ?>
-<table style="background-color: #FFF;width: 100%;padding: 20px;">
+<table style="background-color: #FFF;width: 100%;padding: 20px; width: 50%;">
 <thead>
 <tr>
 <th colspan="2" style="text-align: left;"><?php echo $text_billing_address; ?></th>
@@ -184,5 +142,48 @@
 </tr>
 </table>
 <?php } ?>
+</td><td>
+<?php if ($shipping) { ?>
+<table style="background-color: #FFF;width: 100%;padding: 20px; width: 50%;">
+<thead>
+<tr>
+<th colspan="2" style="text-align: left;"><?php echo $text_shipping_address; ?></th>
+</tr>
+</thead>
+<tr>
+<th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_first_name; ?>: </th>
+<td style="border-top: 1px solid #ddd;"><?php echo $shipping->first_name; ?></td>
+</tr>
+<tr>
+<th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_last_name; ?>: </th>
+<td style="border-top: 1px solid #ddd;"><?php echo $shipping->last_name; ?></td>
+</tr>
+<tr>
+<th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_address1; ?>: </th>
+<td style="border-top: 1px solid #ddd;"><?php echo $shipping->address_line1; ?></td>
+</tr>
+<tr>
+<th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_address2; ?>: </th>
+<td style="border-top: 1px solid #ddd;"><?php echo $shipping->address_line2; ?>&nbsp;</td>
+</tr>
+<tr>
+<th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_postcode; ?>: </th>
+<td style="border-top: 1px solid #ddd;"><?php echo $shipping->address_postcode; ?></td>
+</tr>
+<tr>
+<th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_city; ?>: </th>
+<td style="border-top: 1px solid #ddd;"><?php echo $shipping->getCity()->name; ?></td>
+</tr>
+<tr>
+<th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_state; ?>: </th>
+<td style="border-top: 1px solid #ddd;"><?php echo $shipping->getState()->name; ?></td>
+</tr>
+<tr>
+<th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_country; ?>: </th>
+<td style="border-top: 1px solid #ddd;"><?php echo $shipping->getCountry()->name; ?></td>
+</tr>
+</table>
+<?php } ?>
+</td><td></table>
 </div>
 </div>

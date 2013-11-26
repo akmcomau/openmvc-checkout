@@ -91,6 +91,11 @@ class CheckoutItem extends Model implements ItemInterface {
 		return $type->getSKU();
 	}
 
+	public function isShippable() {
+		$type = $this->getItemType();
+		return $type->isShippable();
+	}
+
 	public function purchase(Checkout $checkout, CheckoutItem $item, ItemInterface $item) {
 		throw new ModelException(__METHOD__.' not allowed on CheckoutItem model');
 	}

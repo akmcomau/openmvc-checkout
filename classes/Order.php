@@ -10,6 +10,8 @@ use core\classes\Language;
 use core\classes\Model;
 use core\classes\Template;
 use core\classes\Email;
+use core\classes\models\Address;
+use core\classes\models\Customer;
 use modules\checkout\classes\models\Checkout;
 use modules\checkout\classes\models\CheckoutItem;
 
@@ -37,13 +39,59 @@ class Order {
 		$this->tracking_number = $tracking_number;
 	}
 
-	public function purchase() {
+	public function purchase(Customer $customer, Address $billing, Address $shipping) {
+		$module_config = $this->config->moduleConfig('Checkout');
 		$model = new Model($this->config, $this->database);
 		$status = $model->getModel('\modules\checkout\classes\models\CheckoutStatus');
 
+		// check if the customer is logged in
+		if ($this->cart->getCustomer()) {
+			$customer = $this->cart->getCustomer();
+		}
+		// else check if the email already exists, attach it to that account
+		else {
+			$exists = $model->getModel('\core\classes\models\Customer')->get([
+				'email' => $customer->email
+			]);
+			if ($exists) {
+				$customer = $exists;
+			}
+			elseif (!$module_config->anonymous_checkout) {
+				throw new \ErrorException('Cannot purchase order with no customer or anonymous checkout');
+			}
+			else {
+				$customer->site_id = $this->config->siteConfig()->site_id;
+				$customer->insert();
+			}
+		}
+
+		// check the billing address
+		$params = $billing->getRecord();
+		$params['customer_id'] = $customer->id;
+		$exists = $model->getModel('\core\classes\models\Address')->get($params);
+		if ($exists) {
+			$billing = $exists;
+		}
+		else {
+			$billing->customer_id = $customer->id;
+			$billing->insert();
+		}
+
+		// check the shipping address
+		$params = $shipping->getRecord();
+		$params['customer_id'] = $customer->id;
+		$exists = $model->getModel('\core\classes\models\Address')->get($params);
+		if ($exists) {
+			$shipping = $exists;
+		}
+		else {
+			$shipping->customer_id = $customer->id;
+			$shipping->insert();
+		}
+
 		// create the checkout record
 		$checkout = $model->getModel('\modules\checkout\classes\models\Checkout');
-		$checkout->customer_id              = $this->cart->getCustomer()->id;
+		$checkout->customer_id              = $customer->id;
 		$checkout->status_id                = $status->getStatusId('Processing');
 		$checkout->payment_code             = 'test';
 		$checkout->checkout_items_cost      = $this->cart->getCartCostPrice();
@@ -54,36 +102,11 @@ class Order {
 		$checkout->checkout_special_offers  = $this->cart->getSpecialOfferAmount();
 		$checkout->checkout_fees            = $this->fees;
 		$checkout->checkout_tracking_number = $this->tracking_number;
+		$checkout->billing_address_id       = $billing->id;
 
-		// Put an address on the order
-		$address = $model->getModel('\core\classes\models\Address')->get(['customer_id' => $this->cart->getCustomer()->id]);
-		if (!$address) {
-
-			// Fake an address
-			$australia = $model->getModel('\core\classes\models\Country')->get(['code' => 'AU']);
-			$qld = $model->getModel('\core\classes\models\State')->get([
-				'country_id' => $australia->id,
-				'name' => 'Queensland',
-			]);
-			$brisbane = $model->getModel('\core\classes\models\City')->get([
-				'country_id' => $australia->id,
-				'state_id' => $qld->id,
-				'name' => 'Brisbane',
-			]);
-			$address = $model->getModel('\core\classes\models\Address');
-			$address->customer_id        = $this->cart->getCustomer()->id;
-			$address->address_first_name = 'Joe';
-			$address->address_last_name  = 'Bloggs';
-			$address->address_line1      = '50 Edward St';
-			$address->address_line2      = '';
-			$address->address_postcode   = '4000';
-			$address->city_id            = $brisbane->id;
-			$address->state_id           = $qld->id;
-			$address->country_id         = $australia->id;
-			$address->insert();
+		if ($this->cart->isShippable()) {
+			$checkout->shipping_address_id = $shipping->id;
 		}
-		$checkout->shipping_address_id = $address->id;
-		$checkout->billing_address_id = $address->id;
 
 		// create the checkout record
 		$checkout->insert();

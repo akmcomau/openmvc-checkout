@@ -33,4 +33,31 @@
 			<?php } ?>
 		</table>
 	</div>
+	<?php if ($created_customer) { ?>
+		<div class="row">
+			<form id="form-password" class="form-login-register" action="<?php echo $this->url->getUrl('Checkout', 'receipt', [$receipt_number]); ?>" method="post">
+				<div class="widget">
+					<div class="widget-header">
+						<h3><?php echo $text_account_created; ?></h3>
+					</div>
+					<div class="widget-content">
+						<p><?php echo $text_account_created_msg; ?></p>
+						<?php echo $form->getHtmlErrorDiv('login-failed', 'login-failed'); ?>
+						<input type="text" name="username" class="form-control" placeholder="<?php echo $text_username; ?>" autofocus="autofocus" value="<?php echo $form->getEncodedValue('username'); ?>" />
+						<?php echo $form->getHtmlErrorDiv('username'); ?>
+						<hr />
+						<input type="password" name="password1" class="form-control" placeholder="<?php echo $text_password1; ?>" />
+						<?php echo $form->getHtmlErrorDiv('password1'); ?>
+						<hr />
+						<input type="password" name="password2" class="form-control" placeholder="<?php echo $text_password2; ?>" />
+						<?php echo $form->getHtmlErrorDiv('password2'); ?>
+						<button name="form-password-submit" class="btn btn-lg btn-primary btn-block" type="submit"><?php echo $text_save; ?></button>
+					</div>
+				</div>
+			</form>
+		</div>
+	<?php } ?>
 </div>
+<script type="text/javascript">
+	<?php echo $form->getJavascriptValidation(); ?>
+</script>

@@ -18,6 +18,7 @@ class Cart {
 
 	protected $cart_contents = [];
 	protected $cart_notes = '';
+	protected $customer = NULL;
 
 	public function __construct(Config $config, Database $database, Request $request) {
 		$this->config = $config;
@@ -105,6 +106,17 @@ class Cart {
 
 	public function getSpecialOfferAmount() {
 		return 0;
+	}
+
+	public function isShippable() {
+		$shippable = FALSE;
+		$contents = $this->getContents();
+		foreach ($contents as $item) {
+			if ($item->isShippable()) {
+				$shippable = TRUE;
+			}
+		}
+		return $shippable;
 	}
 
 	public function getNotes() {
