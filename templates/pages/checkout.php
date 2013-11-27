@@ -31,7 +31,7 @@
 				</table>
 			</div>
 			<div class="row align-right">
-				<?php if (count($payment_types) == 1) { ?>
+				<?php if (count((array)$payment_types) == 1) { ?>
 					<?php foreach ($payment_types as $code => $data) { ?>
 						<input type="hidden" name="payment_method" value="<?php echo $code; ?>" />
 					<?php } ?>
@@ -40,7 +40,7 @@
 						<div>
 							<label>
 								<input type="radio" name="payment_method" value="<?php echo $code; ?>" />
-								<?php echo $data['name']; ?>
+								<?php echo $data->name; ?>
 							</label>
 						</div>
 					<?php } ?>

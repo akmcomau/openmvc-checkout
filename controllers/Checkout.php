@@ -54,10 +54,10 @@ class Checkout extends Controller {
 			return;
 		}
 
-		if (!is_null($this->request->requestParam('payment')) && !is_null(!is_null($this->request->requestParam('payment_method')))) {
+		if ($this->request->requestParam('payment') && $this->request->requestParam('payment_method')) {
 			$code   = $this->request->requestParam('payment_method');
 			$method = $this->config->siteConfig()->checkout->payment_methods->$code;
-			throw new SoftRedirectException($method->controller, 'payment');
+			throw new SoftRedirectException($method->public, 'payment');
 		}
 
 		$this->language->loadLanguageFile('checkout.php', 'modules'.DS.'checkout');

@@ -71,6 +71,16 @@ class Cart {
 		return $total;
 	}
 
+	public function getGrandTotal() {
+		$total = $this->getCartTotal();
+
+		// Add shipping
+
+		// Discounts
+
+		return $total;
+	}
+
 	public function getCartCostPrice() {
 		$total = 0;
 		$contents = $this->getContents();

@@ -24,6 +24,22 @@ class CheckoutStatus extends Model {
 			'data_length'    => 256,
 			'null_allowed'   => FALSE,
 		],
+		'checkout_status_pending' => [
+			'data_type'      => 'bool',
+			'null_allowed'   => FALSE,
+		],
+		'checkout_status_processing' => [
+			'data_type'      => 'bool',
+			'null_allowed'   => FALSE,
+		],
+		'checkout_status_successful' => [
+			'data_type'      => 'bool',
+			'null_allowed'   => FALSE,
+		],
+		'checkout_status_failed' => [
+			'data_type'      => 'bool',
+			'null_allowed'   => FALSE,
+		],
 	];
 
 	public function getStatusId($name) {

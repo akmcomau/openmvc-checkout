@@ -94,7 +94,7 @@ class Order {
 		// create the checkout record
 		$checkout = $model->getModel('\modules\checkout\classes\models\Checkout');
 		$checkout->customer_id              = $customer->id;
-		$checkout->status_id                = $status->getStatusId('Processing');
+		$checkout->status_id                = $status->getStatusId('Pending');
 		$checkout->payment_code             = 'test';
 		$checkout->checkout_items_cost      = $this->cart->getCartCostPrice();
 		$checkout->checkout_shipping_cost   = $this->cart->getShippingCost();
