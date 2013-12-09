@@ -123,6 +123,7 @@ class Order {
 			$checkout_item->checkout_item_type_id = $item->id;
 			$checkout_item->cost_price = $item->getCostPrice();
 			$checkout_item->sell_price = $item->getPrice();
+			$checkout_item->tax = 0; // TODO FIXME
 			$checkout_item->quantity = $item->getQuantity();
 			$checkout_item->insert();
 			$item->purchase($checkout, $checkout_item, $item);

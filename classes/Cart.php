@@ -52,9 +52,11 @@ class Cart {
 		foreach ($this->cart_contents as $type => $items) {
 			$object = $model->getModel($this->typeToItem($type));
 			foreach ($items as $id => $quantity) {
-				$cart_item = $object->get(['id' => $id]);
-				$cart_item->setQuantity($quantity);
-				$contents[] = $cart_item;
+				$cart_item = $object->get(['id' => $id, 'active' => TRUE]);
+				if ($cart_item) {
+					$cart_item->setQuantity($quantity);
+					$contents[] = $cart_item;
+				}
 			}
 		}
 		return $contents;

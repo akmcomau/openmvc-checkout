@@ -31,9 +31,14 @@ class CheckoutItem extends Model implements ItemInterface {
 		'checkout_item_cost_price' => [
 			'data_type'      => 'numeric',
 			'data_length'    => [6, 4],
-			'null_allowed'   => FALSE,
+			'null_allowed'   => TRUE,
 		],
 		'checkout_item_sell_price' => [
+			'data_type'      => 'numeric',
+			'data_length'    => [6, 4],
+			'null_allowed'   => FALSE,
+		],
+		'checkout_item_tax' => [
 			'data_type'      => 'numeric',
 			'data_length'    => [6, 4],
 			'null_allowed'   => FALSE,
