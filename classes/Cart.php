@@ -38,6 +38,13 @@ class Cart {
 		}
 	}
 
+	public function getContentsString($language) {
+		return $language->get('cart_contents_string', [
+			count($this->getItemCount()),
+			money_format('%n', $this->getGrandTotal()),
+		]);
+	}
+
 	public function getCustomer() {
 		return $this->customer;
 	}
@@ -60,6 +67,15 @@ class Cart {
 			}
 		}
 		return $contents;
+	}
+
+	public function getItemCount() {
+		$count = 0;
+		$contents = $this->getContents();
+		foreach ($contents as $item) {
+			$count = $item->getQuantity();
+		}
+		return $count;
 	}
 
 	public function getCartTotal() {
