@@ -15,7 +15,7 @@ class Cart extends Controller {
 		$this->language->loadLanguageFile('checkout.php', 'modules'.DS.'checkout');
 		$cart = new CartContents($this->config, $this->database, $this->request);
 
-		if (isset($this->request->request_params['update-cart'])) {
+		if (isset($this->request->request_params['update-cart']) || isset($this->request->request_params['checkout'])) {
 			if (is_array($this->request->requestParam('quantity'))) {
 				foreach ($this->request->requestParam('quantity') as $item => $quantity) {
 					if (preg_match('/^(\w+):(\d+)$/', $item, $matches)) {
@@ -34,10 +34,13 @@ class Cart extends Controller {
 					}
 				}
 			}
-			throw new RedirectException($this->url->getUrl('Cart'));
-		}
-		elseif (isset($this->request->request_params['checkout'])) {
-			throw new RedirectException($this->url->getUrl('Checkout'));
+
+			if (isset($this->request->request_params['checkout'])) {
+				throw new RedirectException($this->url->getUrl('Checkout'));
+			}
+			else {
+				throw new RedirectException($this->url->getUrl('Cart'));
+			}
 		}
 
 		$data = [
@@ -46,6 +49,21 @@ class Cart extends Controller {
 		];
 		$template = $this->getTemplate('pages/cart.php', $data, 'modules'.DS.'checkout');
 		$this->response->setContent($template->render());
+	}
+
+	public function cartHeader() {
+		$this->language->loadLanguageFile('checkout.php', 'modules'.DS.'checkout');
+		$cart = new CartContents($this->config, $this->database, $this->request);
+
+		$data = [
+			'contents' => $cart->getContents(),
+			'total' => $cart->getCartTotal(),
+		];
+		$template = $this->getTemplate('pages/cart_header.php', $data, 'modules'.DS.'checkout');
+		$this->response->setJsonContent($this, json_encode([
+			'success' => TRUE,
+			'content' => $template->render()
+		]));
 	}
 
 	public function clear() {

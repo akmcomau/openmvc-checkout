@@ -40,7 +40,7 @@ class Cart {
 
 	public function getContentsString($language) {
 		return $language->get('cart_contents_string', [
-			count($this->getItemCount()),
+			$this->getItemCount(),
 			money_format('%n', $this->getGrandTotal()),
 		]);
 	}
@@ -73,7 +73,7 @@ class Cart {
 		$count = 0;
 		$contents = $this->getContents();
 		foreach ($contents as $item) {
-			$count = $item->getQuantity();
+			$count += $item->getQuantity();
 		}
 		return $count;
 	}
