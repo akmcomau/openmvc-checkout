@@ -1,7 +1,7 @@
 <div class="container">
 	<h1><?php echo $text_cart; ?></h1>
 	<form action="<?php echo $this->url->getUrl('Cart'); ?>" method="post">
-		<div class="row public-form">
+		<div class="row public-form"><div class="col-md-12">
 			<table class="table">
 				<tr>
 					<th><?php echo $text_remove; ?></th>
@@ -34,13 +34,13 @@
 					<th><?php echo money_format('%n', $total); ?></th>
 				</tr>
 			</table>
-			<div class="row">
-				<div class="col-md-6 col-sm-6 col-xs-6 align-left">
-					<button type="submit" class="btn btn-primary" name="update-cart"><?php echo $text_update; ?></button>
-				</div>
-				<div class="col-md-6 col-sm-6 col-xs-6 align-right">
-					<button type="submit" class="btn btn-primary" name="checkout"><?php echo $text_checkout; ?></button>
-				</div>
+		</div></div>
+		<div class="row">
+			<div class="col-md-6 col-sm-6 col-xs-6 align-left">
+				<button type="submit" class="btn btn-primary" name="update-cart"><?php echo $text_update; ?></button>
+			</div>
+			<div class="col-md-6 col-sm-6 col-xs-6 align-right">
+				<button type="submit" class="btn btn-primary" name="checkout"><?php echo $text_checkout; ?></button>
 			</div>
 		</div>
 	</form>

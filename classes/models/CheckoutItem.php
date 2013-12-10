@@ -28,6 +28,16 @@ class CheckoutItem extends Model implements ItemInterface {
 			'data_type'      => 'int',
 			'null_allowed'   => FALSE,
 		],
+		'checkout_item_sku' => [
+			'data_type'      => 'text',
+			'data_length'    => 64,
+			'null_allowed'   => FALSE,
+		],
+		'checkout_item_name' => [
+			'data_type'      => 'text',
+			'data_length'    => 128,
+			'null_allowed'   => FALSE,
+		],
 		'checkout_item_cost_price' => [
 			'data_type'      => 'numeric',
 			'data_length'    => [6, 4],
@@ -87,13 +97,11 @@ class CheckoutItem extends Model implements ItemInterface {
 	}
 
 	public function getName() {
-		$type = $this->getItemType();
-		return $type->getName();
+		return $this->name;
 	}
 
 	public function getSKU() {
-		$type = $this->getItemType();
-		return $type->getSKU();
+		return $this->sku;
 	}
 
 	public function isShippable() {

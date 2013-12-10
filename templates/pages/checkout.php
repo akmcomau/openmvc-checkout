@@ -1,8 +1,8 @@
 <div class="container">
 	<h1><?php echo $text_checkout; ?></h1>
-	<form action="" method="post">
+	<form action="" method="post" id="form-checkout">
 		<div class="row public-form">
-			<div class="row">
+			<div class="col-md-12">
 				<table class="table">
 					<tr>
 						<th class="hidden-xs"><?php echo $text_sku; ?></th>
@@ -30,7 +30,9 @@
 					<?php } ?>
 				</table>
 			</div>
-			<div class="row align-right">
+		</div>
+		<div class="row align-right">
+			<div class="col-md-12">
 				<?php if (count((array)$payment_types) == 1) { ?>
 					<?php foreach ($payment_types as $code => $data) { ?>
 						<input type="hidden" name="payment_method" value="<?php echo $code; ?>" />
@@ -46,8 +48,16 @@
 					<?php } ?>
 					<br />
 				<?php } ?>
-				<button type="submit" class="btn btn-primary" name="payment" value="1"><?php echo $text_pay; ?></button>
+				<button type="submit" class="btn btn-primary" id="payment-button" name="payment" value="1"><?php echo $text_pay; ?></button>
 			</div>
 		</div>
 	</form>
 </div>
+<script type="text/javascript">
+	$('#payment-button').click(function() {
+		$('<img src="/core/themes/default/images/spinner.gif" width="40px" height="40px" />').insertAfter($(this));
+		$('<input type="hidden" name="payment" value="1" />').insertAfter($(this));
+		$(this).remove();
+		$('#form-checkout').submit();
+	});
+</script>

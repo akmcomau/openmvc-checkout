@@ -121,6 +121,8 @@ class Order {
 			$checkout_item->checkout_id = $checkout->id;
 			$checkout_item->checkout_item_type = $item->getType();
 			$checkout_item->checkout_item_type_id = $item->id;
+			$checkout_item->checkout_item_name = $item->getName();
+			$checkout_item->checkout_item_sku = $item->getSKU();
 			$checkout_item->cost_price = $item->getCostPrice();
 			$checkout_item->sell_price = $item->getPrice();
 			$checkout_item->tax = 0; // TODO FIXME
