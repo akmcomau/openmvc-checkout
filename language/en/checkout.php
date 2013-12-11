@@ -8,6 +8,7 @@ $_LANGUAGE = [
 	'price' => 'Price',
 	'quantity' => 'Quantity',
 	'total' => 'Total',
+	'grand_total' => 'Grand Total',
 	'subtotal' => 'Sub-Total',
 	'subtotal' => 'Sub-Total',
 	'update' => 'Update Cart',

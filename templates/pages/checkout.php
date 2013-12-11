@@ -28,6 +28,14 @@
 							<th><?php echo money_format('%n', $value); ?></th>
 						</tr>
 					<?php } ?>
+					<?php if (count($totals) > 1) { ?>
+						<tr>
+							<th class="visible-xs"></th>
+							<th class="hidden-xs" colspan="3"></th>
+							<th><?php echo $text_grand_total; ?></th>
+							<th><?php echo money_format('%n', $grand_total); ?></th>
+						</tr>
+					<?php } ?>
 				</table>
 			</div>
 		</div>

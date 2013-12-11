@@ -18,8 +18,18 @@ class Checkout extends Controller {
 	];
 
 	public function index($type = NULL) {
+		$cart = new CartContents($this->config, $this->database, $this->request);
 		$module_config = $this->config->moduleConfig('Checkout');
 		$this->language->loadLanguageFile('checkout.php', 'modules'.DS.'checkout');
+
+		// FIXME: Currently support for only one type of shipping method
+		if (count($this->config->siteConfig()->checkout->shipping_methods) && !$cart->hasShippingMethod()) {
+			foreach ($this->config->siteConfig()->checkout->shipping_methods as $name => $shipping_config) {
+				// break now and $shipping methood has the first shipping method
+				break;
+			}
+			throw new SoftRedirectException($shipping_config->public, 'shipping');
+		}
 
 		// Check for an anonymous checkout or show login register page
 		$anonymous_checkout = FALSE;
@@ -61,11 +71,11 @@ class Checkout extends Controller {
 		}
 
 		$this->language->loadLanguageFile('checkout.php', 'modules'.DS.'checkout');
-		$cart = new CartContents($this->config, $this->database, $this->request);
 
 		$data = [
 			'contents' => $cart->getContents(),
 			'totals' => $cart->getTotals($this->language),
+			'grand_total' => $cart->getGrandTotal(),
 			'payment_types' => $this->config->siteConfig()->checkout->payment_methods,
 		];
 		$template = $this->getTemplate('pages/checkout.php', $data, 'modules'.DS.'checkout');

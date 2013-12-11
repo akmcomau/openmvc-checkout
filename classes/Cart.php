@@ -18,6 +18,7 @@ class Cart {
 
 	protected $cart_contents = [];
 	protected $cart_notes = '';
+	protected $cart_shipping = NULL;
 	protected $customer = NULL;
 
 	public function __construct(Config $config, Database $database, Request $request) {
@@ -35,14 +36,24 @@ class Cart {
 		if (!is_null($request->session->get('cart'))) {
 			$this->cart_contents = $request->session->get(['cart', 'contents']);
 			$this->cart_notes    = $request->session->get(['cart', 'notes']);
+			$this->cart_shipping = $request->session->get(['cart', 'shipping']);
 		}
 	}
 
 	public function getContentsString($language) {
 		return $language->get('cart_contents_string', [
 			$this->getItemCount(),
-			money_format('%n', $this->getGrandTotal()),
+			money_format('%n', $this->getCartTotal()),
 		]);
+	}
+
+	public function getShipping() {
+		return $this->cart_shipping;
+	}
+
+	public function setShipping(array $shipping) {
+		$this->cart_shipping = $shipping;
+		$this->save();
 	}
 
 	public function getCustomer() {
@@ -90,12 +101,11 @@ class Cart {
 	}
 
 	public function getGrandTotal() {
-		$total = $this->getCartTotal();
-
-		// Add shipping
-
-		// Discounts
-
+		$total  = 0;
+		$totals = $this->getTotals();
+		foreach ($totals as $name => $value) {
+			$total += $value;
+		}
 		return $total;
 	}
 
@@ -110,12 +120,23 @@ class Cart {
 		return $total;
 	}
 
-	public function getTotals($language) {
+	public function getTotals($language = NULL) {
 		$totals = [];
 
-		// TODO Add other totals here
+		if ($language) {
+			$totals[$language->get('total')] = $this->getCartTotal();
+		}
+		else {
+			$totals['Total'] = $this->getCartTotal();
+		}
 
-		$totals[$language->get('total')] = $this->getCartTotal();
+		// TODO Add other totals here
+		if ($this->cart_shipping) {
+			foreach ($this->cart_shipping as $name => $data) {
+				$method = $this->config->siteConfig()->checkout->shipping_methods->$name;
+				$totals[$method->name] = $data['sell'];
+			}
+		}
 
 		return $totals;
 	}
@@ -152,11 +173,16 @@ class Cart {
 	}
 
 	public function save() {
-		$cart = ['contents' => $this->cart_contents, 'notes' => $this->cart_notes];
+		$cart = [
+			'contents' => $this->cart_contents,
+			'notes' => $this->cart_notes,
+			'shipping' => $this->cart_shipping,
+		];
 		$this->request->session->set('cart', $cart);
 	}
 
 	public function clear() {
+		$this->cart_shipping = NULL;
 		$this->cart_contents = [];
 		$this->cart_notes = '';
 		$this->save();
@@ -179,6 +205,7 @@ class Cart {
 			$this->cart_contents[$type][$id] = $item->getMaxQuantity();
 		}
 
+		$this->cart_shipping = NULL;
 		$this->save();
 	}
 
@@ -199,12 +226,14 @@ class Cart {
 			$this->cart_contents[$type][$id] = $item->getMaxQuantity();
 		}
 
+		$this->cart_shipping = NULL;
 		$this->save();
 	}
 
 	public function remove($type, $id) {
 		$item = $this->getItem($type, $id);
 		unset($this->cart_contents[$type][$id]);
+		$this->cart_shipping = NULL;
 		$this->save();
 	}
 
@@ -231,6 +260,20 @@ class Cart {
 		}
 
 		throw new ErrorException('Invalid checkout class: '.$class);
+	}
+
+	public function hasShippingMethod() {
+		// if the cart is not shippable, return true
+		if (!$this->isShippable()) {
+			return TRUE;
+		}
+
+		if ($this->cart_shipping) {
+			return TRUE;
+		}
+		else {
+			return FALSE;
+		}
 	}
 }
 
