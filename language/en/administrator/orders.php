@@ -25,6 +25,7 @@ $_LANGUAGE = [
 	'shipping_sell' => 'Shipping Sell',
 	'item_cost' => 'Items Cost',
 	'items_amount' => 'Amount',
+	'grand_total' => 'Grand Total',
 	'shipping_amount' => 'Shipping',
 	'total' => 'Total',
 	'shipping_cost' => 'Shipping Cost',

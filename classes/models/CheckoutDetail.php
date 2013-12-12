@@ -33,6 +33,11 @@ class CheckoutDetail extends Model {
 			'data_length'    => [6, 4],
 			'null_allowed'   => FALSE,
 		],
+		'checkout_detail_cost' => [
+			'data_type'      => 'numeric',
+			'data_length'    => [6, 4],
+			'null_allowed'   => FALSE,
+		],
 	];
 
 	protected $indexes = [

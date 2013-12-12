@@ -122,14 +122,39 @@ class Checkout extends Model {
 		return $this->checkout_amount + $this->checkout_shipping - $this->special_offers;
 	}
 
-	public function getTotals($language) {
+	public function getTotals($language = NULL) {
 		$totals = [];
 
-		// TODO Add other totals here
+		if ($language) {
+			$totals[$language->get('total')] = $this->checkout_amount;
+		}
+		else {
+			$totals['Total'] = $this->checkout_amount;
+		}
 
-		$totals[$language->get('total')] = $this->checkout_amount;
+		$details = $this->getModel('\modules\checkout\classes\models\CheckoutDetail')->getMulti([
+			'checkout_id' => $this->id,
+		]);
+		foreach ($details as $detail) {
+			switch ($detail->type) {
+				case 'shipping':
+					$code = $detail->type_code;
+					$method = $this->config->siteConfig()->checkout->shipping_methods->$code;
+					$totals[$method->name] = $detail->amount;
+					break;
+			}
+		}
 
 		return $totals;
+	}
+
+	public function getGrandTotal() {
+		$total  = 0;
+		$totals = $this->getTotals();
+		foreach ($totals as $name => $value) {
+			$total += $value;
+		}
+		return $total;
 	}
 
 	public function decodeReferenceNumber($reference) {

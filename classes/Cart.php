@@ -141,19 +141,53 @@ class Cart {
 		return $totals;
 	}
 
+	public function getSubTotalsDetail() {
+		$sub_totals = [];
+
+		if ($this->cart_shipping) {
+			foreach ($this->cart_shipping as $name => $data) {
+				$method = $this->config->siteConfig()->checkout->shipping_methods->$name;
+				$sub_totals[$method->name] = [
+					'type' => 'shipping',
+					'code' => $name,
+					'sell' => $data['sell'],
+					'cost' => $data['cost'],
+				];
+			}
+		}
+
+		return $sub_totals;
+	}
+
 	public function getCartTax() {
+		// TODO: return tax
 		return 0;
 	}
 
 	public function getShippingCost() {
-		return 0;
+		$total = 0;
+		if ($this->cart_shipping) {
+			foreach ($this->cart_shipping as $name => $data) {
+				$method = $this->config->siteConfig()->checkout->shipping_methods->$name;
+				$total += $data['cost'];
+			}
+		}
+		return $total;
 	}
 
 	public function getShippingSell() {
-		return 0;
+		$total = 0;
+		if ($this->cart_shipping) {
+			foreach ($this->cart_shipping as $name => $data) {
+				$method = $this->config->siteConfig()->checkout->shipping_methods->$name;
+				$total += $data['sell'];
+			}
+		}
+		return $total;
 	}
 
 	public function getSpecialOfferAmount() {
+		// TODO: special offers amount
 		return 0;
 	}
 

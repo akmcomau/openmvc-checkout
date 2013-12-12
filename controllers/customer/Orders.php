@@ -55,6 +55,7 @@ class Orders extends Controller {
 			'customer' => $checkout->getCustomer(),
 			'shipping' => $checkout->getShippingAddress(),
 			'billing'  => $checkout->getBillingAddress(),
+			'grand_total' => $checkout->getGrandTotal(),
 		];
 		$template = $this->getTemplate('pages/customer/view_order.php', $data, 'modules'.DS.'checkout');
 		$this->response->setContent($template->render());

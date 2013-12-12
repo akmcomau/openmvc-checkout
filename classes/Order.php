@@ -97,10 +97,10 @@ class Order {
 		$checkout->status_id                = $status->getStatusId('Pending');
 		$checkout->payment_code             = 'test';
 		$checkout->checkout_items_cost      = $this->cart->getCartCostPrice();
-		$checkout->checkout_shipping_cost   = $this->cart->getShippingCost();
 		$checkout->checkout_amount          = $this->cart->getCartTotal();
 		$checkout->checkout_tax             = $this->cart->getCartTax();
 		$checkout->checkout_shipping        = $this->cart->getShippingSell();
+		$checkout->checkout_shipping_cost   = $this->cart->getShippingCost();
 		$checkout->checkout_special_offers  = $this->cart->getSpecialOfferAmount();
 		$checkout->checkout_fees            = $this->fees;
 		$checkout->checkout_tracking_number = $this->tracking_number;
@@ -114,6 +114,18 @@ class Order {
 
 		// create the checkout record
 		$checkout->insert();
+
+		// create the checkout detail records
+		$sub_totals = $this->cart->getSubTotalsDetail();
+		foreach ($sub_totals as $detail) {
+			$checkout_detail = $model->getModel('\modules\checkout\classes\models\CheckoutDetail');
+			$checkout_detail->checkout_id = $checkout->id;
+			$checkout_detail->type        = $detail['type'];
+			$checkout_detail->type_code   = $detail['code'];
+			$checkout_detail->amount      = $detail['sell'];
+			$checkout_detail->cost        = $detail['cost'];
+			$checkout_detail->insert();
+		}
 
 		// create the cart item records
 		foreach ($this->cart->getContents() as $item) {
