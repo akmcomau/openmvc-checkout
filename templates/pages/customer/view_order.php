@@ -1,5 +1,5 @@
 <br />
-<div class="container page-area">
+<div class="<?php echo $page_div_class; ?> page-area">
 	<h3 class="align-center">
 		<?php echo $text_receipt_number; ?>:
 		<?php echo $checkout->getReferenceNumber(); ?>

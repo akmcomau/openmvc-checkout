@@ -1,4 +1,4 @@
-<div class="container">
+<div class="<?php echo $page_div_class; ?>">
 	<h1><?php echo $text_receipt; ?></h1>
 	<h3 class="align-center">
 		<?php echo $text_receipt_number; ?>:

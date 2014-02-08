@@ -1,4 +1,4 @@
-<div class="container">
+<div class="<?php echo $page_div_class; ?>">
 	<h1><?php echo $text_checkout; ?></h1>
 	<form action="" method="post" id="form-checkout">
 		<div class="row public-form">
