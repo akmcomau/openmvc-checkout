@@ -19,7 +19,7 @@ class Checkout extends Controller {
 
 	public function index($type = NULL) {
 		$cart = new CartContents($this->config, $this->database, $this->request);
-		$module_config = $this->config->moduleConfig('Checkout');
+		$module_config = $this->config->moduleConfig('\modules\checkout');
 		$this->language->loadLanguageFile('checkout.php', 'modules'.DS.'checkout');
 
 		// FIXME: Currently support for only one type of shipping method

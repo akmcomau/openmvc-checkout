@@ -40,7 +40,7 @@ class Order {
 	}
 
 	public function purchase(Customer $customer, Address $billing, Address $shipping) {
-		$module_config = $this->config->moduleConfig('Checkout');
+		$module_config = $this->config->moduleConfig('\modules\checkout');
 		$model = new Model($this->config, $this->database);
 		$status = $model->getModel('\modules\checkout\classes\models\CheckoutStatus');
 
