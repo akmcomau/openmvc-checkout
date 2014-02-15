@@ -17,6 +17,10 @@ class Checkout extends Controller {
 	protected $permissions = [
 	];
 
+	public function getAllUrls($include_filter = NULL, $exclude_filter = NULL) {
+		return [];
+	}
+
 	public function index($type = NULL) {
 		$cart = new CartContents($this->config, $this->database, $this->request);
 		$module_config = $this->config->moduleConfig('\modules\checkout');

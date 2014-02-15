@@ -14,6 +14,10 @@ class Orders extends Controller {
 		'view' => ['customer'],
 	];
 
+	public function getAllUrls($include_filter = NULL, $exclude_filter = NULL) {
+		return [];
+	}
+
 	public function index() {
 		$this->language->loadLanguageFile('administrator/orders.php', 'modules'.DS.'checkout');
 

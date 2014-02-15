@@ -11,6 +11,10 @@ use modules\checkout\classes\Cart as CartContents;
 
 class Cart extends Controller {
 
+	public function getAllUrls($include_filter = NULL, $exclude_filter = NULL) {
+		return [];
+	}
+
 	public function index() {
 		$this->language->loadLanguageFile('checkout.php', 'modules'.DS.'checkout');
 		$cart = new CartContents($this->config, $this->database, $this->request);
