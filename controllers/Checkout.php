@@ -109,6 +109,7 @@ class Checkout extends Controller {
 			'contents' => $checkout->getItems(),
 			'receipt_number' => $checkout->getReferenceNumber(),
 			'totals' => $checkout->getTotals($this->language),
+			'grand_total' => $checkout->getGrandTotal(),
 			'created_customer' => ($this->request->session->get('anonymous_checkout_purchase') && $customer->password == ''),
 			'form' => $form,
 		];

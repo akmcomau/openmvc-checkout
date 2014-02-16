@@ -122,8 +122,8 @@ class Order {
 			$checkout_detail->checkout_id = $checkout->id;
 			$checkout_detail->type        = $detail['type'];
 			$checkout_detail->type_code   = $detail['code'];
-			$checkout_detail->amount      = $detail['sell'];
-			$checkout_detail->cost        = $detail['cost'];
+			$checkout_detail->amount      = $detail['sell'] ? $detail['sell'] : 0;
+			$checkout_detail->cost        = $detail['cost'] ? $detail['cost'] : 0;
 			$checkout_detail->insert();
 		}
 
