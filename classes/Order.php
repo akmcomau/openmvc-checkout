@@ -39,7 +39,7 @@ class Order {
 		$this->tracking_number = $tracking_number;
 	}
 
-	public function purchase(Customer $customer, Address $billing, Address $shipping) {
+	public function purchase($payment_code, Customer $customer, Address $billing, Address $shipping) {
 		$module_config = $this->config->moduleConfig('\modules\checkout');
 		$model = new Model($this->config, $this->database);
 		$status = $model->getModel('\modules\checkout\classes\models\CheckoutStatus');
@@ -95,7 +95,7 @@ class Order {
 		$checkout = $model->getModel('\modules\checkout\classes\models\Checkout');
 		$checkout->customer_id              = $customer->id;
 		$checkout->status_id                = $status->getStatusId('Pending');
-		$checkout->payment_code             = 'test';
+		$checkout->payment_code             = $payment_code;
 		$checkout->checkout_items_cost      = $this->cart->getCartCostPrice();
 		$checkout->checkout_amount          = $this->cart->getCartTotal();
 		$checkout->checkout_tax             = $this->cart->getCartTax();
