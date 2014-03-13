@@ -34,9 +34,11 @@ class Cart {
 		}
 
 		if (!is_null($request->session->get('cart'))) {
-			$this->cart_contents = $request->session->get(['cart', 'contents']);
-			$this->cart_notes    = $request->session->get(['cart', 'notes']);
-			$this->cart_shipping = $request->session->get(['cart', 'shipping']);
+			if (!is_null($request->session->get(['cart', 'contents']))) {
+				$this->cart_contents = $request->session->get(['cart', 'contents']);
+				$this->cart_notes    = $request->session->get(['cart', 'notes']);
+				$this->cart_shipping = $request->session->get(['cart', 'shipping']);
+			}
 		}
 	}
 
