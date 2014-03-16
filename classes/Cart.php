@@ -8,6 +8,7 @@ use core\classes\Database;
 use core\classes\Request;
 use core\classes\URL;
 use core\classes\Model;
+use core\classes\Logger;
 use core\classes\models\Customer;
 
 class Cart {
@@ -15,6 +16,7 @@ class Cart {
 	protected $url;
 	protected $request;
 	protected $config;
+	protected $logger;
 
 	protected $cart_contents = [];
 	protected $cart_notes = '';
@@ -26,6 +28,7 @@ class Cart {
 		$this->database = $database;
 		$this->request = $request;
 		$this->url = new URL($config);
+		$this->logger = Logger::getLogger(get_class($this));
 
 		$customer_id = $request->getAuthentication()->getCustomerID();
 		if ($customer_id) {
@@ -47,6 +50,14 @@ class Cart {
 			$this->getItemCount(),
 			money_format('%n', $this->getCartTotal()),
 		]);
+	}
+
+	public function getRawContents() {
+		return [
+			'contents' => $this->cart_contents,
+			'notes' => $this->cart_notes,
+			'shipping' => $this->cart_shipping,
+		];
 	}
 
 	public function getShipping() {
@@ -209,15 +220,11 @@ class Cart {
 	}
 
 	public function save() {
-		$cart = [
-			'contents' => $this->cart_contents,
-			'notes' => $this->cart_notes,
-			'shipping' => $this->cart_shipping,
-		];
-		$this->request->session->set('cart', $cart);
+		$this->request->session->set('cart', $this->getRawContents());
 	}
 
 	public function clear() {
+		$this->logger->info("Clear Cart");
 		$this->cart_shipping = NULL;
 		$this->cart_contents = [];
 		$this->cart_notes = '';
@@ -225,6 +232,7 @@ class Cart {
 	}
 
 	public function add($type, $id, $quantity) {
+		$this->logger->info("Add To Cart: $quantity x $type => $id");
 		$item = $this->getItem($type, $id, $quantity);
 
 		if (isset($this->cart_contents[$type][$id])) {
@@ -246,6 +254,7 @@ class Cart {
 	}
 
 	public function update($type, $id, $quantity) {
+		$this->logger->info("Update Cart: $quantity x $type => $id");
 		if ((int)$quantity == 0) {
 			return $this->remove($type, $id);
 		}
@@ -267,6 +276,7 @@ class Cart {
 	}
 
 	public function remove($type, $id) {
+		$this->logger->info("Remove from Cart: $type => $id");
 		$item = $this->getItem($type, $id);
 		unset($this->cart_contents[$type][$id]);
 		$this->cart_shipping = NULL;

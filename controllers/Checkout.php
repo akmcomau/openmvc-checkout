@@ -26,6 +26,12 @@ class Checkout extends Controller {
 		$module_config = $this->config->moduleConfig('\modules\checkout');
 		$this->language->loadLanguageFile('checkout.php', 'modules'.DS.'checkout');
 
+		// if the cart is empty go to the cart page
+		if ($cart->getItemCount() == 0) {
+			$this->logger->info('Cart is empty');
+			throw new RedirectException('Cart');
+		}
+
 		// FIXME: Currently support for only one type of shipping method
 		if (count($this->config->siteConfig()->checkout->shipping_methods) && !$cart->hasShippingMethod()) {
 			foreach ($this->config->siteConfig()->checkout->shipping_methods as $name => $shipping_config) {

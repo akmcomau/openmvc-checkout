@@ -8,6 +8,7 @@ use core\classes\Database;
 use core\classes\URL;
 use core\classes\Language;
 use core\classes\Model;
+use core\classes\Logger;
 use core\classes\Template;
 use core\classes\Email;
 use core\classes\models\Address;
@@ -20,6 +21,7 @@ class Order {
 	protected $url;
 	protected $cart;
 	protected $config;
+	protected $logger;
 
 	protected $fees = 0;
 	protected $tracking_number = '';
@@ -29,6 +31,7 @@ class Order {
 		$this->database = $database;
 		$this->cart = $cart;
 		$this->url = new URL($config);
+		$this->logger = Logger::getLogger(get_class($this));
 	}
 
 	public function setFees($fees) {
@@ -43,6 +46,9 @@ class Order {
 		$module_config = $this->config->moduleConfig('\modules\checkout');
 		$model = new Model($this->config, $this->database);
 		$status = $model->getModel('\modules\checkout\classes\models\CheckoutStatus');
+
+		$this->logger->info('Cart Contents: '.json_encode($this->cart->getRawContents()));
+		$this->logger->info('Cart Totals: '.json_encode($this->cart->getTotals()));
 
 		// check if the customer is logged in
 		if ($this->cart->getCustomer()) {
