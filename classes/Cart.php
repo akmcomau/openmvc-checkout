@@ -234,6 +234,9 @@ class Cart {
 	public function add($type, $id, $quantity) {
 		$this->logger->info("Add To Cart: $quantity x $type => $id");
 		$item = $this->getItem($type, $id, $quantity);
+		if (!$item) {
+			return;
+		}
 
 		if (isset($this->cart_contents[$type][$id])) {
 			$quantity += $this->cart_contents[$type][$id];
@@ -260,6 +263,9 @@ class Cart {
 		}
 
 		$item = $this->getItem($type, $id);
+		if (!$item) {
+			return;
+		}
 
 		if (!$item->allowMultiple()) {
 			$this->cart_contents[$type] = [];
@@ -278,6 +284,9 @@ class Cart {
 	public function remove($type, $id) {
 		$this->logger->info("Remove from Cart: $type => $id");
 		$item = $this->getItem($type, $id);
+		if ($item) {
+			return;
+		}
 		unset($this->cart_contents[$type][$id]);
 		$this->cart_shipping = NULL;
 		$this->save();
@@ -289,7 +298,8 @@ class Cart {
 		$object = new $class($this->config, $this->database);
 		$item = $object->get(['id' => $id]);
 		if (!$item) {
-			throw new ErrorException("Invalid checkout item: $type / $id");
+			$this->logger->info("Invalid checkout item: $type / $id");
+			return NULL;
 		}
 		return $item;
 	}
