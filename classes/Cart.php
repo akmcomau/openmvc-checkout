@@ -296,7 +296,7 @@ class Cart {
 		$id = (int)$id;
 		$class = $this->typeToItem($type);
 		$object = new $class($this->config, $this->database);
-		$item = $object->get(['id' => $id]);
+		$item = $object->get(['id' => $id, 'active' => TRUE]);
 		if (!$item) {
 			$this->logger->info("Invalid checkout item: $type / $id");
 			return NULL;
