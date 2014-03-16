@@ -284,7 +284,7 @@ class Cart {
 	public function remove($type, $id) {
 		$this->logger->info("Remove from Cart: $type => $id");
 		$item = $this->getItem($type, $id);
-		if ($item) {
+		if (!$item) {
 			return;
 		}
 		unset($this->cart_contents[$type][$id]);
