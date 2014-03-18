@@ -66,7 +66,7 @@
 	$('#payment-button').click(function() {
 		$('<img src="/core/themes/default/images/spinner.gif" width="40px" height="40px" />').insertAfter($(this));
 		$('<input type="hidden" name="payment" value="1" />').insertAfter($(this));
-		$(this).remove();
 		$('#form-checkout').submit();
+		$(this).hide();
 	});
 </script>
