@@ -149,6 +149,21 @@ class Order {
 			$item->purchase($checkout, $checkout_item, $item);
 		}
 
+		// insert the purchase event
+		if (!$this->config->is_robot && $this->config->siteConfig()->enable_analytics && isset($_SESSION['db_session_id'])) {
+			$session = $model->getModel('\core\classes\models\Session')->get(['id' => $_SESSION['db_session_id']]);
+			if ($session) {
+				$session_event = $model->getModel('\core\classes\models\SessionEvent');
+				$session_event->session_id = $session->id;
+				$session_event->time       = date('c');
+				$session_event->category   = 'checkout';
+				$session_event->type       = 'purchase';
+				$session_event->sub_type   = NULL;
+				$session_event->value      = $this->cart->getGrandTotal();
+				$session_event->insert();
+			}
+		}
+
 		return $checkout;
 	}
 
