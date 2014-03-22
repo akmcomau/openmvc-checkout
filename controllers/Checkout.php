@@ -111,9 +111,35 @@ class Checkout extends Controller {
 			$form->setNotification('error', $this->language->get('notification_password_error'));
 		}
 
+		$transaction_ref = $checkout->getReferenceNumber();
+		if ($this->config->siteConfig()->enable_analytics && $this->config->siteConfig()->enable_analytics_ecommerce) {
+			$ecommerce = (object)[
+				'id'          => $transaction_ref,
+				'affiliation' => $this->config->siteConfig()->name,
+				'revenue'     => $checkout->getGrandTotal(),
+				'shipping'    => $checkout->shipping,
+				'tax'         => 0,
+				'currency'    => 'AUD',
+				'items'       => [],
+			];
+
+			foreach ($checkout->getItems() as $item) {
+				$ecommerce->items[] = (object)[
+					'id'       => $transaction_ref,
+					'name'     => $item->getName(),
+					'sku'      => $item->getSKU(),
+					'category' => $item->getItemType()->getCategoryName(),
+					'price'    => $item->getPrice(),
+					'quantity' => $item->getQuantity(),
+				];
+			}
+
+			$this->layout->setTemplateData(['ecommerce' => $ecommerce]);
+		}
+
 		$data = [
 			'contents' => $checkout->getItems(),
-			'receipt_number' => $checkout->getReferenceNumber(),
+			'receipt_number' => $transaction_ref,
 			'totals' => $checkout->getTotals($this->language),
 			'grand_total' => $checkout->getGrandTotal(),
 			'created_customer' => ($this->request->session->get('anonymous_checkout_purchase') && $customer->password == ''),
