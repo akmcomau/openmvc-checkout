@@ -7,6 +7,7 @@ $_LANGUAGE = [
 	'name' => 'Product Name',
 	'price' => 'Price',
 	'quantity' => 'Quantity',
+	'qty' => 'Qty',
 	'total' => 'Total',
 	'grand_total' => 'Grand Total',
 	'subtotal' => 'Sub-Total',
