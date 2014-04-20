@@ -5,7 +5,6 @@ function load_header_cart() {
 			url: "/Cart/cartHeader",
 			dataType: "json"
 		}).done(function(data) {
-			console.log(data);
 			if (data.success) {
 				$('#cart-dropdown').html(data.content);
 			}
