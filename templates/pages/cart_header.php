@@ -17,7 +17,7 @@
 								<input type="text" class="form-control small-text" name="quantity[<?php echo $item->getType().':'.$item->id; ?>]" value="<?php echo $item->getQuantity(); ?>" />
 							<?php } ?>
 						</td>
-						<td><?php echo money_format('%n', $item->getTotal()); ?></td>
+						<td><?php echo money_format('%n', $item->getSellTotal()); ?></td>
 					</tr>
 				<?php } ?>
 				<tr>

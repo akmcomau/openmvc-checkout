@@ -49,7 +49,7 @@ class Cart extends Controller {
 
 		$data = [
 			'contents' => $cart->getContents(),
-			'total' => $cart->getCartTotal(),
+			'total' => $cart->getCartSellTotal(),
 		];
 		$template = $this->getTemplate('pages/cart.php', $data, 'modules'.DS.'checkout');
 		$this->response->setContent($template->render());
@@ -61,7 +61,7 @@ class Cart extends Controller {
 
 		$data = [
 			'contents' => $cart->getContents(),
-			'total' => $cart->getCartTotal(),
+			'total' => $cart->getCartSellTotal(),
 		];
 		$template = $this->getTemplate('pages/cart_header.php', $data, 'modules'.DS.'checkout');
 		$this->response->setJsonContent($this, json_encode([

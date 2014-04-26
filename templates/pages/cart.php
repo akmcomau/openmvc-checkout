@@ -16,7 +16,7 @@
 						<td><input type="checkbox" name="remove[]" value="<?php echo $item->getType().':'.$item->id; ?>" /></td>
 						<td class="hidden-xs"><?php echo $item->getSKU(); ?></td>
 						<td><?php echo $item->getName(); ?></td>
-						<td class="hidden-xs"><?php echo money_format('%n', $item->getPrice()); ?></td>
+						<td class="hidden-xs"><?php echo money_format('%n', $item->getSellPrice()); ?></td>
 						<td>
 							<?php if ($item->getMaxQuantity() == 1 && $item->getQuantity() == 1) { ?>
 								<?php echo $item->getQuantity(); ?>
@@ -24,7 +24,7 @@
 								<input type="text" class="form-control small-text" name="quantity[<?php echo $item->getType().':'.$item->id; ?>]" value="<?php echo $item->getQuantity(); ?>" />
 							<?php } ?>
 						</td>
-						<td><?php echo money_format('%n', $item->getTotal()); ?></td>
+						<td><?php echo money_format('%n', $item->getSellTotal()); ?></td>
 					</tr>
 				<?php } ?>
 				<tr>

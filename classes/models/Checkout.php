@@ -142,6 +142,12 @@ class Checkout extends Model {
 					$method = $this->config->siteConfig()->checkout->shipping_methods->$code;
 					$totals[$method->name] = $detail->amount;
 					break;
+
+				case 'tax':
+					$code = $detail->type_code;
+					$tax_config = $this->config->siteConfig()->checkout->tax_types->$code;
+					$totals[$tax_config->name] = $detail->amount;
+					break;
 			}
 		}
 

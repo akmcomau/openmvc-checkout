@@ -48,7 +48,7 @@ class Cart {
 	public function getContentsString($language) {
 		return $language->get('cart_contents_string', [
 			$this->getItemCount(),
-			money_format('%n', $this->getCartTotal()),
+			money_format('%n', $this->getCartSellTotal()),
 		]);
 	}
 
@@ -102,6 +102,21 @@ class Cart {
 		return $count;
 	}
 
+	public function getCartSellTotal() {
+		$total = $this->getCartTotal();
+
+		$checkout_config = $this->config->moduleConfig('\modules\checkout');
+		$tax_type = $checkout_config->tax_type;
+		$tax_class = NULL;
+		if ($tax_type) {
+			$tax_class = $this->config->siteConfig()->checkout->tax_types->$tax_type->class;
+			$tax_class = new $tax_class($this->config, $this->database);
+			$total = $tax_class->calculateTax($total) + $total;
+		}
+
+		return $total;
+	}
+
 	public function getCartTotal() {
 		$total = 0;
 		$contents = $this->getContents();
@@ -110,6 +125,7 @@ class Cart {
 			$item->setTotal($sub_total);
 			$total += money_format('%^!n', $sub_total);
 		}
+
 		return $total;
 	}
 
@@ -137,18 +153,35 @@ class Cart {
 		$totals = [];
 
 		if ($language) {
-			$totals[$language->get('total')] = $this->getCartTotal();
+			$totals[$language->get('total')] = $this->getCartTotal(FALSE);
 		}
 		else {
-			$totals['Total'] = $this->getCartTotal();
+			$totals['Total'] = $this->getCartTotal(FALSE);
 		}
 
-		// TODO Add other totals here
+		// Shipping total
 		if ($this->cart_shipping) {
 			foreach ($this->cart_shipping as $name => $data) {
 				$method = $this->config->siteConfig()->checkout->shipping_methods->$name;
 				$totals[$method->name] = $data['sell'];
 			}
+		}
+
+		// add tax total
+		$checkout_config = $this->config->moduleConfig('\modules\checkout');
+		$tax_type = $checkout_config->tax_type;
+		$tax_class = NULL;
+		if ($tax_type) {
+			$tax_config = $this->config->siteConfig()->checkout->tax_types->$tax_type;
+			$tax_class  = $tax_config->class;
+			$tax_class  = new $tax_class($this->config, $this->database);
+
+			$sub_total = 0;
+			foreach ($totals as $value) {
+				$sub_total += $value;
+			}
+
+			$totals[$tax_config->name] = $tax_class->calculateTax($sub_total);
 		}
 
 		return $totals;
@@ -167,6 +200,26 @@ class Cart {
 					'cost' => $data['cost'],
 				];
 			}
+		}
+
+		// add tax total
+		$checkout_config = $this->config->moduleConfig('\modules\checkout');
+		$tax_type = $checkout_config->tax_type;
+		$tax_class = NULL;
+		if ($tax_type) {
+			$totals     = $this->getTotals();
+			$tax_config = $this->config->siteConfig()->checkout->tax_types->$tax_type;
+			$tax_class  = $tax_config->class;
+			$tax_class  = new $tax_class($this->config, $this->database);
+
+			$tax = $totals[$tax_config->name];
+
+			$sub_totals[$tax_config->name] = [
+				'type' => 'tax',
+				'code' => $tax_type,
+				'sell' => $tax,
+				'cost' => $tax,
+			];
 		}
 
 		return $sub_totals;
