@@ -14,6 +14,7 @@ $_MODULE = [
 	"default_config" => [
 		"anonymous_checkout" => TRUE,
 		"show_prices_inc_tax" => TRUE,
+		"enable_upsell" => TRUE,
 		"tax_type" => NULL,
 	]
 ];

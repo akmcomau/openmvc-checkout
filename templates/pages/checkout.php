@@ -61,6 +61,32 @@
 			</div>
 		</div>
 	</form>
+
+	<?php if (isset($also_purchased)) { ?>
+		<br /><br />
+		<h3><?php echo $text_checkup_upsell_message; ?></h3>
+		<div class="row">
+			<?php foreach($also_purchased as $product) { ?>
+				<div class="col-md-4 col-sm-6 product-cell">
+					<a href="<?php echo $product->getUrl($this->url); ?>" class="product">
+						<h4><?php echo htmlspecialchars($product->name); ?></h4>
+						<?php
+							$images = $product->getImages();
+							$image  = NULL;
+							if (count($images)) {
+								$image = $images[0];
+								?><img src="<?php echo $image->getThumbnailUrl(); ?>" /><?php
+							}
+						?>
+					</a>
+					<div class="add-to-cart">
+						<div class="price"><?php echo  money_format('%n', $product->getSellPrice()); ?></div>
+						<a href="<?php echo $this->url->getUrl('Cart', 'add', ['product', $product->id]); ?>" class="btn btn-primary"><?php echo $text_add_to_cart; ?></a>
+					</div>
+				</div>
+			<?php } ?>
+		</div>
+	<?php } ?>
 </div>
 <script type="text/javascript">
 	$('#payment-button').click(function() {

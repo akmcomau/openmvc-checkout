@@ -239,4 +239,64 @@ class Checkout extends Model {
 		]);
 		return $this->objects['billing_address'];
 	}
+
+	public function alsoPurchased($cart_contents, $limit = 3) {
+		$sql = "
+			SELECT
+				*
+			FROM (
+				SELECT
+					checkout_item_type,
+					checkout_item_type_id,
+					COUNT(*) AS count
+				FROM
+					checkout_item
+				WHERE
+					checkout_id IN (
+						SELECT
+							checkout_id
+						FROM
+							checkout_item
+						WHERE
+		";
+
+		$parts = [];
+		foreach ($cart_contents as $item) {
+			$parts[] = "
+						(
+							checkout_item_type = ".$this->database->quote($item->getType())."
+							AND checkout_item_type_id = ".(int)$item->id."
+						)
+			";
+		}
+		$sql .= join("OR", $parts);
+
+		$sql .= "
+					)
+		";
+
+		// Don't want the same products
+		$sql .= "AND NOT " . join("AND NOT ", $parts);
+
+		$sql .= "
+				GROUP BY
+					checkout_item_type,
+					checkout_item_type_id
+			) AS items
+			ORDER BY count DESC, RANDOM()
+			LIMIT ".(int)$limit."
+		";
+
+		$purchased = [];
+		$items = $this->database->queryMulti($sql);
+		foreach ($items as $item) {
+			$type = $item['checkout_item_type'];
+			$item_type = $this->config->siteConfig()->checkout->item_types->$type;
+			$class = $item_type->item;
+			$object = (new $class($this->config, $this->database))->get(['id' => $item['checkout_item_type_id']]);
+			$purchased[] = $object;
+		}
+
+		return $purchased;
+	}
 }

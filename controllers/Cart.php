@@ -16,6 +16,7 @@ class Cart extends Controller {
 	}
 
 	public function index() {
+		$module_config = $this->config->moduleConfig('\modules\checkout');
 		$this->language->loadLanguageFile('checkout.php', 'modules'.DS.'checkout');
 		$cart = new CartContents($this->config, $this->database, $this->request);
 
@@ -51,6 +52,13 @@ class Cart extends Controller {
 			'contents' => $cart->getContents(),
 			'total' => $cart->getCartSellTotal(),
 		];
+
+		// is also purchased enabled
+		if ($module_config->enable_upsell) {
+			$checkout = $this->model->getModel('\modules\checkout\classes\models\Checkout');
+			$data['also_purchased'] = $checkout->alsoPurchased($cart->getContents());
+		}
+
 		$template = $this->getTemplate('pages/cart.php', $data, 'modules'.DS.'checkout');
 		$this->response->setContent($template->render());
 	}

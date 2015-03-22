@@ -88,6 +88,13 @@ class Checkout extends Controller {
 			'grand_total' => $cart->getGrandTotal(),
 			'payment_types' => $this->config->siteConfig()->checkout->payment_methods,
 		];
+
+		// is also purchased enabled
+		if ($module_config->enable_upsell) {
+			$checkout = $this->model->getModel('\modules\checkout\classes\models\Checkout');
+			$data['also_purchased'] = $checkout->alsoPurchased($cart->getContents());
+		}
+
 		$template = $this->getTemplate('pages/checkout.php', $data, 'modules'.DS.'checkout');
 		$this->response->setContent($template->render());
 	}
