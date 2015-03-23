@@ -3,7 +3,7 @@
 $_LANGUAGE = [
 	'checkout' => 'Checkout',
 	'add_to_cart' => 'Add to Cart',
-	'checkup_upsell_message' => 'Products you may be interested in',
+	'checkup_upsell_message' => 'Products you may also be interested in',
 	'cart' => 'Shopping Cart',
 	'sku' => 'Stock Code',
 	'name' => 'Product Name',
