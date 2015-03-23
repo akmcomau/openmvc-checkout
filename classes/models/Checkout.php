@@ -241,6 +241,8 @@ class Checkout extends Model {
 	}
 
 	public function alsoPurchased($cart_contents, $limit = 3) {
+		if (count($cart_contents) == 0) return [];
+
 		$sql = "
 			SELECT
 				*
