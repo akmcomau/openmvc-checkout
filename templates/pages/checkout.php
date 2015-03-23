@@ -62,7 +62,7 @@
 		</div>
 	</form>
 
-	<?php if (isset($also_purchased)) { ?>
+	<?php if (isset($also_purchased) && count($also_purchased) > 0) { ?>
 		<br /><br />
 		<h3><?php echo $text_checkup_upsell_message; ?></h3>
 		<div class="row">
