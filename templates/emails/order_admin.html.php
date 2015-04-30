@@ -140,7 +140,7 @@
 </tr>
 <tr>
 <th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_state; ?>: </th>
-<td style="border-top: 1px solid #ddd;"><?php echo $billing->getState()->name; ?></td>
+<td style="border-top: 1px solid #ddd;"><?php echo $billing->getState() ? $billing->getState()->name : ''; ?></td>
 </tr>
 <tr>
 <th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_country; ?>: </th>
@@ -182,7 +182,7 @@
 </tr>
 <tr>
 <th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_state; ?>: </th>
-<td style="border-top: 1px solid #ddd;"><?php echo $shipping->getState()->name; ?></td>
+<td style="border-top: 1px solid #ddd;"><?php echo $shipping->getState() ? $shipping->getState()->name : ''; ?></td>
 </tr>
 <tr>
 <th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_country; ?>: </th>

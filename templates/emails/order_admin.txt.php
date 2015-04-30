@@ -80,7 +80,7 @@
 
 <?php echo $text_city; ?>: <?php echo $shipping->getCity()->name; ?>
 
-<?php echo $text_state; ?>: <?php echo $shipping->getState()->name; ?>
+<?php echo $text_state; ?>: <?php echo $shipping->getState() ? $shipping->getState()->name : ''; ?>
 
 <?php echo $text_country; ?>: <?php echo $shipping->getCountry()->name; ?>
 
@@ -103,7 +103,7 @@
 
 <?php echo $text_city; ?>: <?php echo $billing->getCity()->name; ?>
 
-<?php echo $text_state; ?>: <?php echo $billing->getState()->name; ?>
+<?php echo $text_state; ?>: <?php echo $billing->getState() ? $billing->getState()->name : ''; ?>
 
 <?php echo $text_country; ?>: <?php echo $billing->getCountry()->name; ?>
 

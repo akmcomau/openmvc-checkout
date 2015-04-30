@@ -141,7 +141,7 @@
 						</tr>
 						<tr>
 							<th class="align-right"><?php echo $text_state; ?></th>
-							<td><?php echo $shipping->getState()->name; ?></td>
+							<td><?php echo $shipping->getState() ? $shipping->getState()->name : ''; ?></td>
 						</tr>
 						<tr>
 							<th class="align-right"><?php echo $text_country; ?></th>
@@ -184,7 +184,7 @@
 						</tr>
 						<tr>
 							<th class="align-right"><?php echo $text_state; ?></th>
-							<td><?php echo $billing->getState()->name; ?></td>
+							<td><?php echo $billing->getState() ? $billing->getState()->name : ''; ?></td>
 						</tr>
 						<tr>
 							<th class="align-right"><?php echo $text_country; ?></th>
