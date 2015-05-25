@@ -23,7 +23,7 @@ class Checkout extends Model {
 		],
 		'customer_id' => [
 			'data_type'      => 'bigint',
-			'null_allowed'   => FALSE,
+			'null_allowed'   => TRUE,
 		],
 		'checkout_status_id' => [
 			'data_type'      => 'int',
@@ -45,7 +45,7 @@ class Checkout extends Model {
 		],
 		'billing_address_id' => [
 			'data_type'      => 'bigint',
-			'null_allowed'   => FALSE,
+			'null_allowed'   => TRUE,
 		],
 		'checkout_items_cost' => [
 			'data_type'      => 'numeric',
@@ -81,6 +81,10 @@ class Checkout extends Model {
 			'data_type'      => 'numeric',
 			'data_length'    => [6, 4],
 			'null_allowed'   => FALSE,
+		],
+		'checkout_receipt_note' => [
+			'data_type'      => 'text',
+			'null_allowed'   => TRUE,
 		],
 	];
 

@@ -96,7 +96,7 @@
 							<?php foreach ($orders as $order) { ?>
 							<tr>
 								<td nowrap="nowrap"><?php echo $order->getReferenceNumber(); ?></td>
-								<td class="hidden-xxs"><?php echo $order->getCustomer()->login; ?></td>
+								<td class="hidden-xxs"><?php echo $order->getCustomer() ? $order->getCustomer()->login : ''; ?></td>
 								<td class="hidden-xs"><?php echo $order->created; ?></td>
 								<td class="hidden-sm hidden-xs"><?php echo money_format('%n', $order->special_offers); ?></td>
 								<td class="hidden-sm hidden-xs"><?php echo money_format('%n', $order->tax); ?></td>

@@ -42,7 +42,7 @@ class Order {
 		$this->tracking_number = $tracking_number;
 	}
 
-	public function purchase($payment_code, Customer $customer, Address $billing, Address $shipping) {
+	public function purchase($payment_code, Customer $customer = NULL, Address $billing = NULL, Address $shipping = NULL) {
 		$module_config = $this->config->moduleConfig('\modules\checkout');
 		$model = new Model($this->config, $this->database);
 		$status = $model->getModel('\modules\checkout\classes\models\CheckoutStatus');
@@ -57,49 +57,55 @@ class Order {
 		}
 		// else check if the email already exists, attach it to that account
 		else {
-			$exists = $model->getModel('\core\classes\models\Customer')->get([
-				'email' => $customer->email
-			]);
-			if ($exists) {
-				$customer = $exists;
-			}
-			elseif (!$module_config->anonymous_checkout) {
-				throw new \ErrorException('Cannot purchase order with no customer or anonymous checkout');
-			}
-			else {
-				$customer->site_id = $this->config->siteConfig()->site_id;
-				$customer->insert();
+			if ($customer) {
+				$exists = $model->getModel('\core\classes\models\Customer')->get([
+					'email' => $customer->email
+				]);
+				if ($exists) {
+					$customer = $exists;
+				}
+				elseif (!$module_config->anonymous_checkout) {
+					throw new \ErrorException('Cannot purchase order with no customer or anonymous checkout');
+				}
+				else {
+					$customer->site_id = $this->config->siteConfig()->site_id;
+					$customer->insert();
+				}
 			}
 			$was_anonymous = TRUE;
 		}
 
 		// check the billing address
-		$params = $billing->getRecord();
-		$params['customer_id'] = $customer->id;
-		$exists = $model->getModel('\core\classes\models\Address')->get($params);
-		if ($exists) {
-			$billing = $exists;
-		}
-		else {
-			$billing->customer_id = $customer->id;
-			$billing->insert();
+		if ($billing) {
+			$params = $billing->getRecord();
+			$params['customer_id'] = $customer->id;
+			$exists = $model->getModel('\core\classes\models\Address')->get($params);
+			if ($exists) {
+				$billing = $exists;
+			}
+			else {
+				$billing->customer_id = $customer->id;
+				$billing->insert();
+			}
 		}
 
 		// check the shipping address
-		$params = $shipping->getRecord();
-		$params['customer_id'] = $customer->id;
-		$exists = $model->getModel('\core\classes\models\Address')->get($params);
-		if ($exists) {
-			$shipping = $exists;
-		}
-		else {
-			$shipping->customer_id = $customer->id;
-			$shipping->insert();
+		if ($shipping) {
+			$params = $shipping->getRecord();
+			$params['customer_id'] = $customer->id;
+			$exists = $model->getModel('\core\classes\models\Address')->get($params);
+			if ($exists) {
+				$shipping = $exists;
+			}
+			else {
+				$shipping->customer_id = $customer->id;
+				$shipping->insert();
+			}
 		}
 
 		// create the checkout record
 		$checkout = $model->getModel('\modules\checkout\classes\models\Checkout');
-		$checkout->customer_id              = $customer->id;
+		$checkout->customer_id              = $customer ? $customer->id : NULL;
 		$checkout->status_id                = $status->getStatusId('Pending');
 		$checkout->payment_code             = $payment_code;
 		$checkout->checkout_items_cost      = $this->cart->getCartCostPrice();
@@ -110,11 +116,11 @@ class Order {
 		$checkout->checkout_special_offers  = $this->cart->getSpecialOfferAmount();
 		$checkout->checkout_fees            = $this->fees;
 		$checkout->checkout_tracking_number = $this->tracking_number;
-		$checkout->billing_address_id       = $billing->id;
+		$checkout->billing_address_id       = $billing ? $billing->id : NULL;
 
 		$checkout->anonymous = $was_anonymous;
 
-		if ($this->cart->isShippable()) {
+		if ($shipping && $this->cart->isShippable()) {
 			$checkout->shipping_address_id = $shipping->id;
 		}
 
@@ -162,14 +168,16 @@ class Order {
 		];
 
 		// customer
-		$body = $this->getTemplate($language, 'emails/order_customer.txt.php', $data, 'modules'.DS.'checkout');
-		$html = $this->getTemplate($language, 'emails/order_customer.html.php', $data, 'modules'.DS.'checkout');
-		$email = new Email($this->config);
-		$email->setToEmail($customer->email);
-		$email->setSubject($language->get('customer_order_subject'));
-		$email->setBodyTemplate($body);
-		$email->setHtmlTemplate($html);
-		$email->send();
+		if ($customer) {
+			$body = $this->getTemplate($language, 'emails/order_customer.txt.php', $data, 'modules'.DS.'checkout');
+			$html = $this->getTemplate($language, 'emails/order_customer.html.php', $data, 'modules'.DS.'checkout');
+			$email = new Email($this->config);
+			$email->setToEmail($customer->email);
+			$email->setSubject($language->get('customer_order_subject'));
+			$email->setBodyTemplate($body);
+			$email->setHtmlTemplate($html);
+			$email->send();
+		}
 
 		// admin
 		$body = $this->getTemplate($language, 'emails/order_admin.txt.php', $data, 'modules'.DS.'checkout');

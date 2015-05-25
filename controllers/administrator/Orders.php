@@ -65,7 +65,7 @@ class Orders extends Controller {
 		$checkout = $model->getModel('\modules\checkout\classes\models\Checkout')->get([
 			'id' => (int)$order_id,
 		]);
-		$this->siteProtection($checkout, 'getCustomer');
+		//$this->siteProtection($checkout, 'getCustomer');  FIXME
 
 		$data = [
 			'checkout' => $checkout,

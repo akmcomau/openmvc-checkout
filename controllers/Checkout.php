@@ -149,7 +149,8 @@ class Checkout extends Controller {
 			'receipt_number' => $transaction_ref,
 			'totals' => $checkout->getTotals($this->language),
 			'grand_total' => $checkout->getGrandTotal(),
-			'created_customer' => ($this->request->session->get('anonymous_checkout_purchase') && $customer->password == ''),
+			'receipt_note' => $checkout->receipt_note ? 'text_'.$checkout->receipt_note : NULL,
+			'created_customer' => ($this->request->session->get('anonymous_checkout_purchase') && $customer && $customer->password == ''),
 			'form' => $form,
 		];
 		$template = $this->getTemplate('pages/receipt.php', $data, 'modules'.DS.'checkout');

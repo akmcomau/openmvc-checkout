@@ -54,23 +54,23 @@
 					</thead>
 					<tr>
 						<th class="align-right"><?php echo $text_login; ?></th>
-						<td><?php echo $customer->login; ?></td>
+						<td><?php echo $customer ? $customer->login : 'N/A'; ?></td>
 					</tr>
 					<tr>
 						<th class="align-right"><?php echo $text_first_name; ?></th>
-						<td><?php echo $customer->first_name; ?></td>
+						<td><?php echo $customer ? $customer->first_name : 'N/A'; ?></td>
 					</tr>
 					<tr>
 						<th class="align-right"><?php echo $text_last_name; ?></th>
-						<td><?php echo $customer->last_name; ?></td>
+						<td><?php echo $customer ? $customer->last_name : 'N/A'; ?></td>
 					</tr>
 					<tr>
 						<th class="align-right"><?php echo $text_email; ?></th>
-						<td><?php echo $customer->email; ?></td>
+						<td><?php echo $customer ? $customer->email : 'N/A'; ?></td>
 					</tr>
 					<tr>
 						<th class="align-right"><?php echo $text_phone; ?></th>
-						<td><?php echo $customer->phone; ?></td>
+						<td><?php echo $customer ? $customer->phone : 'N/A'; ?></td>
 					</tr>
 				</table>
 			</div>

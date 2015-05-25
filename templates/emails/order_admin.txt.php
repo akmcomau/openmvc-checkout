@@ -3,7 +3,7 @@
 <?php echo $text_receipt_number; ?>: <?php echo $checkout->getReferenceNumber(); ?>
 
 
-
+<?php if ($checkout->receipt_note) echo $checkout->receipt_note."\n\n\n"; ?>
 <?php echo $text_order_details; ?>
 
 
@@ -30,15 +30,15 @@
 <?php echo $text_customer_details; ?>
 
 
-<?php echo $text_login; ?>: <?php echo $customer->login; ?>
+<?php echo $text_login; ?>: <?php echo $customer ? $customer->login : 'N/A'; ?>
 
-<?php echo $text_first_name; ?>: <?php echo $customer->first_name; ?>
+<?php echo $text_first_name; ?>: <?php echo $customer ? $customer->first_name : 'N/A'; ?>
 
-<?php echo $text_last_name; ?>: <?php echo $customer->last_name; ?>
+<?php echo $text_last_name; ?>: <?php echo $customer ? $customer->last_name : 'N/A'; ?>
 
-<?php echo $text_email; ?>: <?php echo $customer->email; ?>
+<?php echo $text_email; ?>: <?php echo $customer ? $customer->email : 'N/A'; ?>
 
-<?php echo $text_phone; ?>: <?php echo $customer->phone; ?>
+<?php echo $text_phone; ?>: <?php echo $customer ? $customer->phone : 'N/A'; ?>
 
 
 

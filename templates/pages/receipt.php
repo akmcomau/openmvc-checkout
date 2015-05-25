@@ -5,6 +5,10 @@
 		<?php echo $receipt_number; ?>
 	</h3>
 	<br />
+	<?php if ($receipt_note) { ?>
+		<h1 style="color: darkred;"><?php echo nl2br($$receipt_note); ?></h1>
+		<br />
+	<?php } ?>
 	<div class="row public-form">
 		<table class="table">
 			<tr>

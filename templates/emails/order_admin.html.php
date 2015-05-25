@@ -4,6 +4,7 @@
 <?php echo $text_receipt_number; ?>:
 <?php echo $checkout->getReferenceNumber(); ?>
 </h3>
+<?php if ($checkout->receipt_note) echo '<h1>'.nl2br(${'text_'.$checkout->receipt_note}).'</h1>'; ?>
 <br />
 <div>
 <table style="width: 100%;"><tr><td>
@@ -53,23 +54,23 @@
 </thead>
 <tr>
 <th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_login; ?>: </th>
-<td style="border-top: 1px solid #ddd;"><?php echo $customer->login; ?></td>
+<td style="border-top: 1px solid #ddd;"><?php echo $customer ? $customer->login : 'N/A'; ?></td>
 </tr>
 <tr>
 <th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_first_name; ?>: </th>
-<td style="border-top: 1px solid #ddd;"><?php echo $customer->first_name; ?></td>
+<td style="border-top: 1px solid #ddd;"><?php echo $customer ? $customer->first_name : 'N/A'; ?></td>
 </tr>
 <tr>
 <th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_last_name; ?>: </th>
-<td style="border-top: 1px solid #ddd;"><?php echo $customer->last_name; ?></td>
+<td style="border-top: 1px solid #ddd;"><?php echo $customer ? $customer->last_name : 'N/A'; ?></td>
 </tr>
 <tr>
 <th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_email; ?>: </th>
-<td style="border-top: 1px solid #ddd;"><?php echo $customer->email; ?></td>
+<td style="border-top: 1px solid #ddd;"><?php echo $customer ? $customer->email : 'N/A'; ?></td>
 </tr>
 <tr>
 <th style="text-align: right;border-top: 1px solid #ddd;"><?php echo $text_phone; ?>: </th>
-<td style="border-top: 1px solid #ddd;"><?php echo $customer->phone; ?>&nbsp;</td>
+<td style="border-top: 1px solid #ddd;"><?php echo $customer ? $customer->phone : 'N/A'; ?>&nbsp;</td>
 </tr>
 </table>
 </td></tr></table>
