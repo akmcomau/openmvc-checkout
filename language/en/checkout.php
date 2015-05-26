@@ -31,4 +31,5 @@ $_LANGUAGE = [
 	'save' => 'Save',
 	'notification_password_error' => 'There was an error while saving your username/password',
 	'paypal_no_payer_info' => "PayPal has approved your transaction, but for some reason has not responded with any of your details.\n\nYour transaction has not been lost.  We will process this checkout manually and you will receive an email soon.\n\nYou can also send us a message via the contact us page.",
+	'paypal_error_msg' => "PayPal has approved your transaction, but an internal error has occured.\n\nYour transaction has not been lost.  We will process this checkout manually and you will receive an email soon.\n\nYou can also send us a message via the contact us page.",
 ];
