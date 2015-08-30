@@ -30,10 +30,17 @@
 						<th class="align-right"><?php echo $text_shipping_amount; ?></th>
 						<td><?php echo money_format('%n', $checkout->checkout_shipping); ?></td>
 					</tr>
-					<tr>
-						<th class="align-right"><?php echo $text_tax; ?></th>
-						<td><?php echo money_format('%n', $checkout->checkout_tax); ?></td>
-					</tr>
+					<?php if ($checkout->checkout_tax > 0) { ?>
+						<tr>
+							<th class="align-right"><?php echo $text_tax; ?></th>
+							<td><?php echo money_format('%n', $checkout->checkout_tax); ?></td>
+						</tr>
+					<?php } else { ?>
+						<tr>
+							<th class="align-right"><?php echo $text_grand_total; ?></th>
+							<td><?php echo money_format('%n', $grand_total); ?></td>
+						</tr>
+					<?php } ?>
 				</table>
 			</div>
 			<div class="col-md-6">
