@@ -3,6 +3,7 @@
 namespace modules\checkout\classes\models;
 
 use core\classes\Model;
+use core\classes\Module;
 use core\classes\Encryption;
 
 class Checkout extends Model {
@@ -123,17 +124,17 @@ class Checkout extends Model {
 	}
 
 	public function getTotal() {
-		return $this->checkout_amount + $this->checkout_shipping - $this->special_offers;
+		return $this->callPriceHook($this->checkout_amount + $this->checkout_shipping - $this->special_offers);
 	}
 
 	public function getTotals($language = NULL) {
 		$totals = [];
 
 		if ($language) {
-			$totals[$language->get('total')] = $this->checkout_amount;
+			$totals[$language->get('total')] = $this->callPriceHook($this->checkout_amount);
 		}
 		else {
-			$totals['Total'] = $this->checkout_amount;
+			$totals['Total'] = $this->callPriceHook($this->checkout_amount);
 		}
 
 		$details = $this->getModel('\modules\checkout\classes\models\CheckoutDetail')->getMulti([
@@ -144,13 +145,13 @@ class Checkout extends Model {
 				case 'shipping':
 					$code = $detail->type_code;
 					$method = $this->config->siteConfig()->checkout->shipping_methods->$code;
-					$totals[$method->name] = $detail->amount;
+					$totals[$method->name] = $this->callPriceHook($detail->amount);
 					break;
 
 				case 'tax':
 					$code = $detail->type_code;
 					$tax_config = $this->config->siteConfig()->checkout->tax_types->$code;
-					$totals[$tax_config->name] = $detail->amount;
+					$totals[$tax_config->name] = $this->callPriceHook($detail->amount);
 					break;
 			}
 		}
@@ -165,6 +166,19 @@ class Checkout extends Model {
 			$total += $value;
 		}
 		return $total;
+	}
+
+	protected function callPriceHook($price) {
+		$modules = (new Module($this->config))->getEnabledModules();
+		foreach ($modules as $module) {
+			if (isset($module['hooks']['checkout']['getSellPrice'])) {
+				$class = $module['namespace'].'\\'.$module['hooks']['checkout']['getSellPrice'];
+				$this->logger->debug("Calling Hook: $class::getSellPrice");
+				$class = new $class($this->config, $this->database, NULL);
+				$price = call_user_func_array(array($class, 'getSellPrice'), [$price]);
+			}
+		}
+		return $price;
 	}
 
 	public function decodeReferenceNumber($reference) {

@@ -136,7 +136,7 @@ class Checkout extends Controller {
 					'name'     => $item->getName(),
 					'sku'      => $item->getSKU(),
 					'category' => $item->getItemType()->getCategoryName(),
-					'price'    => $item->getPrice(),
+					'price'    => $item->getSellPrice(),
 					'quantity' => $item->getQuantity(),
 				];
 			}

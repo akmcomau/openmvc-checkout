@@ -8,6 +8,7 @@ use core\classes\Database;
 use core\classes\Request;
 use core\classes\URL;
 use core\classes\Model;
+use core\classes\Module;
 use core\classes\Logger;
 use core\classes\models\Customer;
 
@@ -121,7 +122,7 @@ class Cart {
 		$total = 0;
 		$contents = $this->getContents();
 		foreach ($contents as $item) {
-			$sub_total = $item->getQuantity() * $item->getPrice();
+			$sub_total = $item->getQuantity() * $item->getSellPrice();
 			$item->setTotal($sub_total);
 			$total += money_format('%^!n', $sub_total);
 		}
@@ -163,7 +164,7 @@ class Cart {
 		if ($this->cart_shipping) {
 			foreach ($this->cart_shipping as $name => $data) {
 				$method = $this->config->siteConfig()->checkout->shipping_methods->$name;
-				$totals[$method->name] = $data['sell'];
+				$totals[$method->name] = $this->callPriceHook($data['sell']);
 			}
 		}
 
@@ -181,10 +182,23 @@ class Cart {
 				$sub_total += $value;
 			}
 
-			$totals[$tax_config->name] = $tax_class->calculateTax($sub_total);
+			$totals[$tax_config->name] = $this->callPriceHook($tax_class->calculateTax($sub_total));
 		}
 
 		return $totals;
+	}
+
+	protected function callPriceHook($price) {
+		$modules = (new Module($this->config))->getEnabledModules();
+		foreach ($modules as $module) {
+			if (isset($module['hooks']['checkout']['getSellPrice'])) {
+				$class = $module['namespace'].'\\'.$module['hooks']['checkout']['getSellPrice'];
+				$this->logger->debug("Calling Hook: $class::getSellPrice");
+				$class = new $class($this->config, $this->database, NULL);
+				$price = call_user_func_array(array($class, 'getSellPrice'), [$price]);
+			}
+		}
+		return $price;
 	}
 
 	public function getSubTotalsDetail() {

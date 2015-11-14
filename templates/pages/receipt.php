@@ -6,7 +6,7 @@
 	</h3>
 	<br />
 	<?php if ($receipt_note) { ?>
-		<h1 style="color: darkred;"><?php echo nl2br($$receipt_note); ?></h1>
+		<h1 style="color: darkred;"><?php echo nl2br($receipt_note); ?></h1>
 		<br />
 	<?php } ?>
 	<div class="row public-form">
@@ -22,7 +22,7 @@
 				<tr>
 					<td class="hidden-xs"><?php echo $item->getSKU(); ?></td>
 					<td><?php echo $item->getName(); ?></td>
-					<td class="hidden-xs"><?php echo money_format('%n', $item->getPrice()); ?></td>
+					<td class="hidden-xs"><?php echo money_format('%n', $item->getSellPrice()); ?></td>
 					<td><?php echo $item->getQuantity(); ?></td>
 					<td><?php echo money_format('%n', $item->getTotal()); ?></td>
 				</tr>

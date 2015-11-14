@@ -52,7 +52,7 @@
 
 <?php echo $text_name; ?>: <?php echo $item->getName(); ?>
 
-<?php echo $text_price; ?>: <?php echo money_format('%n', $item->getPrice()); ?>
+<?php echo $text_price; ?>: <?php echo money_format('%n', $item->getSellPrice()); ?>
 
 <?php echo $text_quantity; ?>: <?php echo $item->getQuantity(); ?>
 

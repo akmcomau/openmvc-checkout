@@ -91,7 +91,7 @@
 						<tr>
 							<td class="hidden-xs"><?php echo $item->getSKU(); ?></td>
 							<td><?php echo $item->getName(); ?></td>
-							<td class="hidden-xs"><?php echo money_format('%n', $item->getPrice()); ?></td>
+							<td class="hidden-xs"><?php echo money_format('%n', $item->getSellPrice()); ?></td>
 							<td><?php echo $item->getQuantity(); ?></td>
 							<td><?php echo money_format('%n', $item->getTotal()); ?></td>
 						</tr>

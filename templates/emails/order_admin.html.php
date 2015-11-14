@@ -91,7 +91,7 @@
 <tr>
 <td style="border-top: 1px solid #ddd;"><?php echo $item->getSKU(); ?></td>
 <td style="border-top: 1px solid #ddd;"><?php echo $item->getName(); ?></td>
-<td style="border-top: 1px solid #ddd;"><?php echo money_format('%n', $item->getPrice()); ?></td>
+<td style="border-top: 1px solid #ddd;"><?php echo money_format('%n', $item->getSellPrice()); ?></td>
 <td style="border-top: 1px solid #ddd;"><?php echo $item->getQuantity(); ?></td>
 <td style="border-top: 1px solid #ddd;"><?php echo money_format('%n', $item->getTotal()); ?></td>
 </tr>

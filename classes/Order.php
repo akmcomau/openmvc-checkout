@@ -47,8 +47,8 @@ class Order {
 		$model = new Model($this->config, $this->database);
 		$status = $model->getModel('\modules\checkout\classes\models\CheckoutStatus');
 
-		$this->logger->info('Cart Contents: '.json_encode($this->cart->getRawContents()));
-		$this->logger->info('Cart Totals: '.json_encode($this->cart->getTotals()));
+		// Set the default currency
+		$this->config->setLocale($this->config->siteConfig()->site_locale);
 
 		// check if the customer is logged in
 		if ($this->cart->getCustomer()) {
@@ -148,12 +148,15 @@ class Order {
 			$checkout_item->checkout_item_name = $item->getName();
 			$checkout_item->checkout_item_sku = $item->getSKU();
 			$checkout_item->cost_price = $item->getCostPrice();
-			$checkout_item->sell_price = $item->getPrice();
+			$checkout_item->sell_price = $item->getSellPrice();
 			$checkout_item->tax = 0; // TODO FIXME
 			$checkout_item->quantity = $item->getQuantity();
 			$checkout_item->insert();
 			$item->purchase($checkout, $checkout_item, $item);
 		}
+
+		// restore the user's locale
+		$this->config->setLocale($this->config->siteConfig()->locale);
 
 		return $checkout;
 	}

@@ -14,7 +14,7 @@ interface ItemInterface {
 	public function getSKU();
 	public function purchase(Checkout $checkout, CheckoutItem $item, ItemInterface $item);
 
-	public function getPrice();
+	public function getSellPrice();
 	public function getCostPrice();
 
 	public function setQuantity($quantity);
