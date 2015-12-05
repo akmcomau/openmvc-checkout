@@ -44,6 +44,9 @@
 				</tr>
 			<?php } ?>
 		</table>
+		<div class="float-right">
+			<strong><?php echo $this->language->get('curreny', $this->config->siteConfig()->currency); ?></strong>
+		</div>
 	</div>
 	<?php if ($created_customer) { ?>
 		<div class="row">

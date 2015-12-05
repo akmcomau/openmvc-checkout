@@ -70,6 +70,9 @@ class CheckoutItem extends Model implements ItemInterface {
 		'checkout_id' => ['checkout', 'checkout_id'],
 	];
 
+	public $reverse_exchange_rate = FALSE;
+	public $exchange_rate         = 1;
+
 	public function getItemType() {
 		if (isset($this->objects['item_type'])) {
 			return $this->objects['item_type'];
@@ -123,20 +126,12 @@ class CheckoutItem extends Model implements ItemInterface {
 			$value = $this->sell_price;
 		}
 
-		return $this->callPriceHook('getSellPrice', $value);
+		return $this->reverseExchangeRate('getSellPrice', $value);
 	}
 
-	protected function callPriceHook($name, $price) {
-		$modules = (new Module($this->config))->getEnabledModules();
-		foreach ($modules as $module) {
-			if (isset($module['hooks']['checkout'][$name])) {
-				$class = $module['namespace'].'\\'.$module['hooks']['checkout'][$name];
-				$this->logger->debug("Calling Hook: $class::$name");
-				$class = new $class($this->config, $this->database, NULL);
-				$price = call_user_func_array(array($class, $name), [$price]);
-			}
-		}
-		return $price;
+	protected function reverseExchangeRate($name, $price) {
+		if (!$this->reverse_exchange_rate) return $price;
+		return $price / $this->exchange_rate;
 	}
 
 	public function getCostPrice() {

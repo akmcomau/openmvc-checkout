@@ -126,7 +126,6 @@ class Cart {
 			$item->setTotal($sub_total);
 			$total += money_format('%^!n', $sub_total);
 		}
-
 		return $total;
 	}
 
@@ -263,7 +262,7 @@ class Cart {
 				$total += $data['sell'];
 			}
 		}
-		return $total;
+		return $this->callPriceHook($total);
 	}
 
 	public function getSpecialOfferAmount() {

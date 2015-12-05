@@ -20,6 +20,7 @@
 								<th></th>
 							</tr>
 							<?php foreach ($orders as $order) { ?>
+								<?php $this->config->setLocale($order->locale); ?>
 							<tr>
 								<td nowrap="nowrap"><?php echo $order->getReferenceNumber(); ?></td>
 								<td class="hidden-xs"><?php echo $order->created; ?></td>

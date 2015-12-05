@@ -1,4 +1,7 @@
 <div class="<?php echo $page_div_class; ?>">
+	<div class="float-right">
+		<strong><?php echo $this->language->get('curreny', $this->config->siteConfig()->currency); ?></strong>
+	</div>
 	<h1><?php echo $text_checkout; ?></h1>
 	<form action="" method="post" id="form-checkout">
 		<div class="row public-form">

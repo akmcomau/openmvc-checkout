@@ -87,6 +87,21 @@ class Checkout extends Model {
 			'data_type'      => 'text',
 			'null_allowed'   => TRUE,
 		],
+		'checkout_locale' => [
+			'data_type'      => 'text',
+			'max_length'     => 10,
+			'null_allowed'   => FALSE,
+		],
+		'checkout_currency' => [
+			'data_type'      => 'text',
+			'max_length'     => 2,
+			'null_allowed'   => FALSE,
+		],
+		'checkout_exchange_rate' => [
+			'data_type'      => 'numeric',
+			'data_length'    => [6, 4],
+			'null_allowed'   => FALSE,
+		],
 	];
 
 	protected $indexes = [
@@ -113,6 +128,8 @@ class Checkout extends Model {
 		],
 	];
 
+	public $reverse_exchange_rate = FALSE;
+
 	public function getItems() {
 		if (array_key_exists('checkout_items', $this->objects)) {
 			return $this->objects['checkout_items'];
@@ -120,21 +137,27 @@ class Checkout extends Model {
 
 		$checkout_item = $this->getModel('\modules\checkout\classes\models\CheckoutItem');
 		$this->objects['checkout_items'] = $checkout_item->getMulti(['checkout_id' => $this->id]);
+
+		foreach ($this->objects['checkout_items'] as $item) {
+			$item->reverse_exchange_rate = $this->reverse_exchange_rate;
+			$item->exchange_rate = $this->exchange_rate;
+		}
+
 		return $this->objects['checkout_items'];
 	}
 
 	public function getTotal() {
-		return $this->callPriceHook($this->checkout_amount + $this->checkout_shipping - $this->special_offers);
+		return $this->reverseExchangeRate($this->checkout_amount + $this->checkout_shipping - $this->special_offers);
 	}
 
 	public function getTotals($language = NULL) {
 		$totals = [];
 
 		if ($language) {
-			$totals[$language->get('total')] = $this->callPriceHook($this->checkout_amount);
+			$totals[$language->get('total')] = $this->reverseExchangeRate($this->checkout_amount);
 		}
 		else {
-			$totals['Total'] = $this->callPriceHook($this->checkout_amount);
+			$totals['Total'] = $this->reverseExchangeRate($this->checkout_amount);
 		}
 
 		$details = $this->getModel('\modules\checkout\classes\models\CheckoutDetail')->getMulti([
@@ -145,13 +168,13 @@ class Checkout extends Model {
 				case 'shipping':
 					$code = $detail->type_code;
 					$method = $this->config->siteConfig()->checkout->shipping_methods->$code;
-					$totals[$method->name] = $this->callPriceHook($detail->amount);
+					$totals[$method->name] = $this->reverseExchangeRate($detail->amount);
 					break;
 
 				case 'tax':
 					$code = $detail->type_code;
 					$tax_config = $this->config->siteConfig()->checkout->tax_types->$code;
-					$totals[$tax_config->name] = $this->callPriceHook($detail->amount);
+					$totals[$tax_config->name] = $this->reverseExchangeRate($detail->amount);
 					break;
 			}
 		}
@@ -168,17 +191,9 @@ class Checkout extends Model {
 		return $total;
 	}
 
-	protected function callPriceHook($price) {
-		$modules = (new Module($this->config))->getEnabledModules();
-		foreach ($modules as $module) {
-			if (isset($module['hooks']['checkout']['getSellPrice'])) {
-				$class = $module['namespace'].'\\'.$module['hooks']['checkout']['getSellPrice'];
-				$this->logger->debug("Calling Hook: $class::getSellPrice");
-				$class = new $class($this->config, $this->database, NULL);
-				$price = call_user_func_array(array($class, 'getSellPrice'), [$price]);
-			}
-		}
-		return $price;
+	protected function reverseExchangeRate($price) {
+		if (!$this->reverse_exchange_rate) return $price;
+		return $price / $this->exchange_rate;
 	}
 
 	public function decodeReferenceNumber($reference) {

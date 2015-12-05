@@ -94,19 +94,20 @@
 								<th></th>
 							</tr>
 							<?php foreach ($orders as $order) { ?>
-							<tr>
-								<td nowrap="nowrap"><?php echo $order->getReferenceNumber(); ?></td>
-								<td class="hidden-xxs"><?php echo $order->getCustomer() ? $order->getCustomer()->login : ''; ?></td>
-								<td class="hidden-xs"><?php echo $order->created; ?></td>
-								<td class="hidden-sm hidden-xs"><?php echo money_format('%n', $order->special_offers); ?></td>
-								<td class="hidden-sm hidden-xs"><?php echo money_format('%n', $order->tax); ?></td>
-								<td class="hidden-sm hidden-xs"><?php echo money_format('%n', $order->getCostPrice()); ?></td>
-								<td><?php echo money_format('%n', $order->getSellPrice()); ?></td>
-								<td class="hidden-xs"><?php echo money_format('%n', $order->getProfit()); ?></td>
-								<td>
-									<a href="<?php echo $this->url->getUrl('administrator/Orders', 'editOrder', [$order->id]); ?>" class="btn btn-primary"><i class="fa fa-edit" title="<?php echo $text_edit; ?>"></i></a>
-								</td>
-							</tr>
+								<?php $this->config->setLocale($order->locale); ?>
+								<tr>
+									<td nowrap="nowrap"><?php echo $order->getReferenceNumber(); ?></td>
+									<td class="hidden-xxs"><?php echo $order->getCustomer() ? $order->getCustomer()->login : ''; ?></td>
+									<td class="hidden-xs"><?php echo $order->created; ?></td>
+									<td class="hidden-sm hidden-xs"><?php echo money_format('%n', $order->special_offers); ?></td>
+									<td class="hidden-sm hidden-xs"><?php echo money_format('%n', $order->tax); ?></td>
+									<td class="hidden-sm hidden-xs"><?php echo money_format('%n', $order->getCostPrice()); ?></td>
+									<td><?php echo money_format('%n', $order->getSellPrice()); ?></td>
+									<td class="hidden-xs"><?php echo money_format('%n', $order->getProfit()); ?></td>
+									<td>
+										<a href="<?php echo $this->url->getUrl('administrator/Orders', 'editOrder', [$order->id]); ?>" class="btn btn-primary"><i class="fa fa-edit" title="<?php echo $text_edit; ?>"></i></a>
+									</td>
+								</tr>
 							<?php } ?>
 						</table>
 					</form>

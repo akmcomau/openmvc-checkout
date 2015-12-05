@@ -8,6 +8,7 @@ use core\classes\Database;
 use core\classes\URL;
 use core\classes\Language;
 use core\classes\Model;
+use core\classes\Module;
 use core\classes\Logger;
 use core\classes\Template;
 use core\classes\Email;
@@ -46,9 +47,6 @@ class Order {
 		$module_config = $this->config->moduleConfig('\modules\checkout');
 		$model = new Model($this->config, $this->database);
 		$status = $model->getModel('\modules\checkout\classes\models\CheckoutStatus');
-
-		// Set the default currency
-		$this->config->setLocale($this->config->siteConfig()->site_locale);
 
 		// check if the customer is logged in
 		if ($this->cart->getCustomer()) {
@@ -109,7 +107,7 @@ class Order {
 		$checkout->status_id                = $status->getStatusId('Pending');
 		$checkout->payment_code             = $payment_code;
 		$checkout->checkout_items_cost      = $this->cart->getCartCostPrice();
-		$checkout->checkout_amount          = $this->cart->getCartTotal();
+		$checkout->checkout_amount          = $this->cart->getCartSellTotal();
 		$checkout->checkout_tax             = $this->cart->getCartTax();
 		$checkout->checkout_shipping        = $this->cart->getShippingSell();
 		$checkout->checkout_shipping_cost   = $this->cart->getShippingCost();
@@ -117,6 +115,9 @@ class Order {
 		$checkout->checkout_fees            = $this->fees;
 		$checkout->checkout_tracking_number = $this->tracking_number;
 		$checkout->billing_address_id       = $billing ? $billing->id : NULL;
+		$checkout->locale                   = $this->config->siteConfig()->site_locale;
+		$checkout->currency                 = $this->config->siteConfig()->currency;
+		$checkout->exchange_rate            = $this->getExchangeRate($this->config, $this->database);
 
 		$checkout->anonymous = $was_anonymous;
 
@@ -134,8 +135,8 @@ class Order {
 			$checkout_detail->checkout_id = $checkout->id;
 			$checkout_detail->type        = $detail['type'];
 			$checkout_detail->type_code   = $detail['code'];
-			$checkout_detail->amount      = $detail['sell'] ? $detail['sell'] : 0;
-			$checkout_detail->cost        = $detail['cost'] ? $detail['cost'] : 0;
+			$checkout_detail->amount      = $this->applyExchangeRate($this->config, $this->database, $detail['sell'] ? $detail['sell'] : 0);
+			$checkout_detail->cost        = $this->applyExchangeRate($this->config, $this->database, $detail['cost'] ? $detail['cost'] : 0);
 			$checkout_detail->insert();
 		}
 
@@ -155,10 +156,26 @@ class Order {
 			$item->purchase($checkout, $checkout_item, $item);
 		}
 
-		// restore the user's locale
-		$this->config->setLocale($this->config->siteConfig()->locale);
-
 		return $checkout;
+	}
+
+	public static function getExchangeRate($config, $database) {
+		$rate = 1;
+		$modules = (new Module($config))->getEnabledModules();
+		foreach ($modules as $module) {
+			if (isset($module['hooks']['checkout']['getExchangeRate'])) {
+				$class = $module['namespace'].'\\'.$module['hooks']['checkout']['getExchangeRate'];
+				$logger = Logger::getLogger(__CLASS__);
+				$logger->debug("Calling Hook: $class::getExchangeRate");
+				$class = new $class($config, $database, NULL);
+				$rate = call_user_func_array(array($class, 'getExchangeRate'), []);
+			}
+		}
+		return $rate;
+	}
+
+	public static function applyExchangeRate($config, $database, $price) {
+		return $price * self::getExchangeRate($config, $database);
 	}
 
 	public function sendOrderEmails(Checkout $checkout, Language $language) {

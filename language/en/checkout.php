@@ -24,6 +24,7 @@ $_LANGUAGE = [
 	'receipt_from' => 'Receipt from',
 	'order_from' => 'Order from',
 	'items' => 'Items',
+	'curreny' => 'All prices are in %s',
 	'anonymous_checkout' => 'Anonymous Checkout',
 	'dont_login_register' => 'I don\'t want to login or register',
 	'account_created' => 'Account Created',

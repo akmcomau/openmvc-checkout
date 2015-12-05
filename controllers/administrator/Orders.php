@@ -67,6 +67,7 @@ class Orders extends Controller {
 		]);
 		//$this->siteProtection($checkout, 'getCustomer');  FIXME
 
+		$this->config->setLocale($checkout->locale);
 		$data = [
 			'checkout' => $checkout,
 			'customer' => $checkout->getCustomer(),

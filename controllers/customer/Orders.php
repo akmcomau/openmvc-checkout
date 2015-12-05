@@ -54,6 +54,7 @@ class Orders extends Controller {
 			throw new RedirectException($this->getUrl('administrator/Error', 'error_404'));
 		}
 
+		$this->config->setLocale($checkout->locale);
 		$data = [
 			'checkout' => $checkout,
 			'customer' => $checkout->getCustomer(),
