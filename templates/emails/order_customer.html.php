@@ -1,3 +1,9 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
 <div style="background-color: #EEE; border: 1px solid #CCC;">
 <h2><?php echo $text_receipt_from; ?> <?php echo $this->config->siteConfig()->name; ?></h2>
 <h3 style="text-align: center;">
@@ -187,3 +193,5 @@
 </td><td></table>
 </div>
 </div>
+</body>
+</html>

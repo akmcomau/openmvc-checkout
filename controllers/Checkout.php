@@ -53,6 +53,12 @@ class Checkout extends Controller {
 			$form_login    = $controller->getLoginForm();
 			$form_register = $controller->getRegisterForm();
 
+			// get the remember me token
+			$remember_me = NULL;
+			if (isset($this->request->cookies['rememberme'])) {
+				$remember_me = json_decode($this->request->cookies['rememberme']);
+			}
+
 			$data = [
 				'login' => $form_login,
 				'register' => $form_register,
@@ -61,6 +67,7 @@ class Checkout extends Controller {
 				'params' => NULL,
 				'anonymous_checkout_enabled' => $module_config->anonymous_checkout,
 				'anonymous_checkout' => $anonymous_checkout,
+				'remember_me' => $remember_me,
 			];
 
 			$login_template = $this->getTemplate('pages/customer/login_form.php', $data);
