@@ -150,13 +150,26 @@ class Cart {
 	}
 
 	public function getTotals($language = NULL) {
+		$checkout_config = $this->config->moduleConfig('\modules\checkout');
+		$tax_type = $checkout_config->tax_type;
+
 		$totals = [];
 
 		if ($language) {
-			$totals[$language->get('total')] = $this->getCartTotal(FALSE);
+			if ($tax_type) {
+				$totals[$language->get('subtotal')] = $this->getCartTotal(FALSE);
+			}
+			else {
+				$totals[$language->get('total')] = $this->getCartTotal(FALSE);
+			}
 		}
 		else {
-			$totals['Total'] = $this->getCartTotal(FALSE);
+			if ($tax_type) {
+				$totals['Sub-Total'] = $this->getCartTotal(FALSE);
+			}
+			else {
+				$totals['Total'] = $this->getCartTotal(FALSE);
+			}
 		}
 
 		// Shipping total
@@ -168,9 +181,8 @@ class Cart {
 		}
 
 		// add tax total
-		$checkout_config = $this->config->moduleConfig('\modules\checkout');
-		$tax_type = $checkout_config->tax_type;
 		$tax_class = NULL;
+
 		if ($tax_type) {
 			$tax_config = $this->config->siteConfig()->checkout->tax_types->$tax_type;
 			$tax_class  = $tax_config->class;

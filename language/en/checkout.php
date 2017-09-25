@@ -11,6 +11,7 @@ $_LANGUAGE = [
 	'quantity' => 'Quantity',
 	'qty' => 'Qty',
 	'total' => 'Total',
+	'grand_total' => 'Total',
 	'grand_total' => 'Grand Total',
 	'subtotal' => 'Sub-Total',
 	'subtotal' => 'Sub-Total',
