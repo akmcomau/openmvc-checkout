@@ -209,6 +209,10 @@ class Checkout extends Model {
 		return Encryption::obfuscate($this->id, $this->config->siteConfig()->secret);
 	}
 
+	public static function generateReferenceNumber($config, $id) {
+		return Encryption::obfuscate($id, $config->siteConfig()->secret);
+	}
+
 	public function getCostPrice() {
 		return ($this->checkout_items_cost + $this->checkout_shipping_cost);
 	}
