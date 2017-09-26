@@ -148,6 +148,7 @@ class Order {
 			$checkout_item->checkout_item_type_id = $item->id;
 			$checkout_item->checkout_item_name = $item->getName();
 			$checkout_item->checkout_item_sku = $item->getSKU();
+			$checkout_item->checkout_item_model = $item->getModelNo();
 			$checkout_item->cost_price = $item->getCostPrice();
 			$checkout_item->sell_price = $item->getSellPrice();
 			$checkout_item->tax = 0; // TODO FIXME

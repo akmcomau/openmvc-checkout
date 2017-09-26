@@ -326,6 +326,7 @@ class Checkout extends Model {
 			LIMIT ".(int)$limit."
 		";
 
+		$purchased_ids = [];
 		$purchased = [];
 		$items = $this->database->queryMulti($sql);
 		foreach ($items as $item) {
@@ -333,6 +334,34 @@ class Checkout extends Model {
 			$item_type = $this->config->siteConfig()->checkout->item_types->$type;
 			$class = $item_type->item;
 			$object = (new $class($this->config, $this->database))->get(['id' => $item['checkout_item_type_id']]);
+			$purchased[] = $object;
+			$purchased_ids[] = $object->id;
+		}
+
+		// If we have enough items, then return them
+		if (count($purchased) == $limit) {
+			return $purchased;
+		}
+
+		// Else add some more random ones to make up the numbers
+		$num_left = $limit - count($items);
+		$sql = "
+			SELECT
+				product_id
+			FROM
+				product
+			WHERE
+				product_active
+				".((count($purchased_ids) > 0) ? "AND product_id NOT IN (".join(',', $purchased_ids).")" : "")."
+			ORDER BY
+				RANDOM()
+			LIMIT
+				".$num_left."
+		";
+		$items = $this->database->queryMulti($sql);
+		foreach ($items as $item) {
+			$class = '\modules\products\classes\models\Product';
+			$object = (new $class($this->config, $this->database))->get(['id' => $item['product_id']]);
 			$purchased[] = $object;
 		}
 
