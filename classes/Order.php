@@ -107,7 +107,7 @@ class Order {
 		$checkout->status_id                = $status->getStatusId('Pending');
 		$checkout->payment_code             = $payment_code;
 		$checkout->checkout_items_cost      = $this->cart->getCartCostPrice();
-		$checkout->checkout_amount          = $this->cart->getCartSellTotal();
+		$checkout->checkout_amount          = $this->cart->getCartTotal();
 		$checkout->checkout_tax             = $this->cart->getCartTax();
 		$checkout->checkout_shipping        = $this->cart->getShippingSell();
 		$checkout->checkout_shipping_cost   = $this->cart->getShippingCost();

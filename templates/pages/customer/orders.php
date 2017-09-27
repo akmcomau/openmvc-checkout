@@ -30,7 +30,7 @@
 									<td class="hidden-xs"><?php echo money_format('%n', $order->special_offers); ?></td>
 									<td class="hidden-sm hidden-xs"><?php echo money_format('%n', $order->tax); ?></td>
 									*/ ?>
-									<td><?php echo money_format('%n', $order->getTotal()); ?></td>
+									<td><?php echo money_format('%n', $order->getGrandTotal()); ?></td>
 									<td>
 										<a href="<?php echo $this->url->getUrl('customer/Orders', 'view', [$order->getReferenceNumber()]); ?>" class="btn btn-primary" title="<?php echo $text_view; ?>"><i class="fa fa-edit"></i></a>
 									</td>
