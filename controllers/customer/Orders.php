@@ -25,7 +25,12 @@ class Orders extends Controller {
 		$checkout = $model->getModel('\modules\checkout\classes\models\Checkout');
 		$pagination = new Pagination($this->request, 'created', 'desc');
 
-		$params = ['customer_id' => $this->authentication->getCustomerID()];
+		$status = $this->model->getModel('\modules\checkout\classes\models\CheckoutStatus');
+
+		$params = [
+			'customer_id' => $this->authentication->getCustomerID(),
+			'status_id' => ['type' => '!=', 'value' => $status->getStatusId('Pending')],
+		];
 		$orders = $checkout->getMulti($params, $pagination->getOrdering(), $pagination->getLimitOffset());
 		$pagination->setRecordCount($checkout->getCount($params));
 

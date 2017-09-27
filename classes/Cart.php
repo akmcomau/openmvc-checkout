@@ -251,7 +251,16 @@ class Cart {
 	}
 
 	public function getCartTax() {
-		// TODO: return tax
+		$checkout_config = $this->config->moduleConfig('\modules\checkout');
+		$tax_type = $checkout_config->tax_type;
+		if ($tax_type) {
+			$tax_config = $this->config->siteConfig()->checkout->tax_types->$tax_type;
+			$tax_class  = $tax_config->class;
+			$tax_class  = new $tax_class($this->config, $this->database);
+
+			return $this->callPriceHook($tax_class->calculateTax($this->getCartTotal(FALSE)));
+		}
+
 		return 0;
 	}
 
