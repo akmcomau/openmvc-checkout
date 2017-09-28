@@ -51,7 +51,7 @@ class Cart extends Controller {
 		$data = [
 			'contents' => $cart->getContents(),
 			'total' => $cart->getCartSellTotal(),
-			'totals' => $cart->getTotals($this->language),
+			'totals' => $cart->getTotals($this->language, FALSE),
 		];
 
 		// is also purchased enabled

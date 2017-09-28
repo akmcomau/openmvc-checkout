@@ -149,7 +149,7 @@ class Cart {
 		return $total;
 	}
 
-	public function getTotals($language = NULL) {
+	public function getTotals($language = NULL, $include_shipping = TRUE) {
 		$checkout_config = $this->config->moduleConfig('\modules\checkout');
 		$tax_type = $checkout_config->tax_type;
 
@@ -173,7 +173,7 @@ class Cart {
 		}
 
 		// Shipping total
-		if ($this->cart_shipping) {
+		if ($include_shipping && $this->cart_shipping) {
 			foreach ($this->cart_shipping as $name => $data) {
 				$method = $this->config->siteConfig()->checkout->shipping_methods->$name;
 				$totals[$method->name] = $this->callPriceHook($data['sell']);
