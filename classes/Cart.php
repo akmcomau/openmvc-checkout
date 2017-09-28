@@ -222,7 +222,7 @@ class Cart {
 					'type' => 'shipping',
 					'code' => $name,
 					'sell' => $data['sell'],
-					'cost' => $data['cost'],
+					'cost' => isset($data['cost']) ? $data['cost'] : 0,
 				];
 			}
 		}
@@ -269,7 +269,9 @@ class Cart {
 		if ($this->cart_shipping) {
 			foreach ($this->cart_shipping as $name => $data) {
 				$method = $this->config->siteConfig()->checkout->shipping_methods->$name;
-				$total += $data['cost'];
+				if (isset($data['cost'])) {
+					$total += $data['cost'];
+				}
 			}
 		}
 		return $total;
