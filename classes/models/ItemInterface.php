@@ -12,7 +12,7 @@ interface ItemInterface {
 	public function getMaxQuantity();
 	public function getName();
 	public function getSKU();
-	public function purchase(Checkout $checkout, CheckoutItem $item, ItemInterface $item);
+	public function purchase(Checkout $checkout, CheckoutItem $checkout_item, ItemInterface $item);
 
 	public function getSellPrice();
 	public function getCostPrice();
