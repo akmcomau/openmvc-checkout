@@ -110,6 +110,7 @@ class Checkout extends Controller {
 		$bcrypt_cost = $this->config->siteConfig()->bcrypt_cost;
 		$this->language->loadLanguageFile('customer.php');
 		$this->language->loadLanguageFile('checkout.php', 'modules'.DS.'checkout');
+		$this->language->loadLanguageFile('administrator/orders.php', 'modules'.DS.'checkout');
 		$model = new Model($this->config, $this->database);
 		$checkout = $model->getModel('\modules\checkout\classes\models\Checkout')->getByReference($reference);
 		$customer = $checkout->getCustomer();
@@ -153,6 +154,10 @@ class Checkout extends Controller {
 
 		$data = [
 			'contents' => $checkout->getItems(),
+			'checkout' => $checkout,
+			'customer' => $checkout->getCustomer(),
+			'shipping' => $checkout->getShippingAddress(),
+			'billing'  => $checkout->getBillingAddress(),
 			'receipt_number' => $transaction_ref,
 			'totals' => $checkout->getTotals($this->language),
 			'grand_total' => $checkout->getGrandTotal(),
