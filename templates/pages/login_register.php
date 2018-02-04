@@ -1,4 +1,4 @@
-<div class="<?php echo $page_div_class; ?>">
+<div class="<?php echo $page_class; ?>">
 	<div class="row">
 		<div class="col-md-6 col-sm-6">
 			<?php echo $login_form; ?>
