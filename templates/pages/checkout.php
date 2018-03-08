@@ -59,7 +59,7 @@
 					<?php } ?>
 					<br />
 				<?php } ?>
-				<button type="submit" class="btn btn-primary" id="payment-button" name="payment" value="1"><?php echo $text_pay; ?></button>
+				<button type="submit" class="btn btn-primary" id="payment-button" name="payment" value="1"><?php echo $text_continue; ?></button>
 				<img src="/core/themes/default/images/spinner.gif" width="0px" height="0px" />
 			</div>
 		</div>

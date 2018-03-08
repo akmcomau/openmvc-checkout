@@ -1,4 +1,4 @@
-<div class="container">
+<div class="col-md-12">
 	<form action="<?php echo $this->url->getUrl('Cart'); ?>" method="post">
 		<div class="row public-form">
 			<table class="table">

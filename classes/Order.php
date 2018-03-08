@@ -55,18 +55,22 @@ class Order {
 		}
 		// else check if the email already exists, attach it to that account
 		else {
-			if ($customer) {
+			if (!$customer) {
 				$exists = $model->getModel('\core\classes\models\Customer')->get([
-					'email' => $customer->email
+					'email' => $billing->email
 				]);
 				if ($exists) {
 					$customer = $exists;
 				}
-				elseif (!$module_config->anonymous_checkout) {
-					throw new \ErrorException('Cannot purchase order with no customer or anonymous checkout');
-				}
 				else {
+					$customer = $model->getModel('\core\classes\models\Customer');
 					$customer->site_id = $this->config->siteConfig()->site_id;
+					$customer->first_name = $billing->first_name;
+					$customer->last_name = $billing->last_name;
+					$customer->login = $billing->email.'-'.time();
+					$customer->password = '';
+					$customer->email = $billing->email;
+					$customer->phone = $billing->phone;
 					$customer->insert();
 				}
 			}

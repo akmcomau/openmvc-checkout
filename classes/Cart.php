@@ -22,6 +22,9 @@ class Cart {
 	protected $cart_contents = [];
 	protected $cart_notes = '';
 	protected $cart_shipping = NULL;
+	protected $shipping_address = NULL;
+	protected $billing_address = NULL;
+	protected $payment_method = NULL;
 	protected $customer = NULL;
 
 	public function __construct(Config $config, Database $database, Request $request) {
@@ -39,9 +42,12 @@ class Cart {
 
 		if (!is_null($request->session->get('cart'))) {
 			if (!is_null($request->session->get(['cart', 'contents']))) {
-				$this->cart_contents = $request->session->get(['cart', 'contents']);
-				$this->cart_notes    = $request->session->get(['cart', 'notes']);
-				$this->cart_shipping = $request->session->get(['cart', 'shipping']);
+				$this->cart_contents    = $request->session->get(['cart', 'contents']);
+				$this->cart_notes       = $request->session->get(['cart', 'notes']);
+				$this->cart_shipping    = $request->session->get(['cart', 'shipping']);
+				$this->shipping_address = $request->session->get(['cart', 'shipping_address']);
+				$this->billing_address  = $request->session->get(['cart', 'billing_address']);
+				$this->payment_method   = $request->session->get(['cart', 'payment_method']);
 			}
 		}
 	}
@@ -58,6 +64,9 @@ class Cart {
 			'contents' => $this->cart_contents,
 			'notes' => $this->cart_notes,
 			'shipping' => $this->cart_shipping,
+			'shipping_address' => $this->shipping_address,
+			'billing_address' => $this->billing_address,
+			'payment_method' => $this->payment_method,
 		];
 	}
 
@@ -68,6 +77,33 @@ class Cart {
 	public function setShipping(array $shipping) {
 		$this->cart_shipping = $shipping;
 		$this->save();
+	}
+
+	public function setBillingAddress(array $address) {
+		$this->billing_address = $address;
+		$this->save();
+	}
+
+	public function getBillingAddress() {
+		return $this->billing_address;
+	}
+
+	public function setShippingAddress(array $address) {
+		$this->shipping_address = $address;
+		$this->save();
+	}
+
+	public function getShippingAddress() {
+		return $this->shipping_address;
+	}
+
+	public function setPaymentMethod($method) {
+		$this->payment_method = $method;
+		$this->save();
+	}
+
+	public function getPaymentMethod() {
+		return $this->payment_method;
 	}
 
 	public function getCustomer() {
@@ -414,6 +450,38 @@ class Cart {
 		}
 
 		if ($this->cart_shipping) {
+			return TRUE;
+		}
+		else {
+			return FALSE;
+		}
+	}
+
+	public function hasShippingAddress() {
+		$module_config = $this->config->moduleConfig('\modules\checkout');
+
+		// if the cart is not shippable, return true
+		if (!$module_config->shipping_address) {
+			return TRUE;
+		}
+
+		if ($this->shipping_address) {
+			return TRUE;
+		}
+		else {
+			return FALSE;
+		}
+	}
+
+	public function hasBillingAddress() {
+		$module_config = $this->config->moduleConfig('\modules\checkout');
+
+		// if the cart is not shippable, return true
+		if (!$module_config->billing_address) {
+			return TRUE;
+		}
+
+		if ($this->billing_address) {
 			return TRUE;
 		}
 		else {

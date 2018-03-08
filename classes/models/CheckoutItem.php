@@ -32,7 +32,7 @@ class CheckoutItem extends Model implements ItemInterface {
 		'checkout_item_model' => [
 			'data_type'      => 'text',
 			'data_length'    => 64,
-			'null_allowed'   => FALSE,
+			'null_allowed'   => TRUE,
 		],
 		'checkout_item_sku' => [
 			'data_type'      => 'text',

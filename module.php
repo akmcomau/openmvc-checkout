@@ -13,6 +13,8 @@ $_MODULE = [
 	],
 	"default_config" => [
 		"anonymous_checkout" => TRUE,
+		"shipping_address" => FALSE,
+		"billing_address" => FALSE,
 		"show_prices_inc_tax" => TRUE,
 		"enable_upsell" => TRUE,
 		"tax_type" => NULL,

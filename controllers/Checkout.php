@@ -82,12 +82,19 @@ class Checkout extends Controller {
 		}
 
 		if ($this->request->requestParam('payment') && $this->request->requestParam('payment_method')) {
+			// Get the selected payment type
 			$code   = $this->request->requestParam('payment_method');
 			$method = $this->config->siteConfig()->checkout->payment_methods->$code;
+
+			$cart->setPaymentMethod($code);
+
+			// if the shipping/billing addresses need to be obtained
+			if ($module_config->shipping_address || $module_config->billing_address) {
+				throw new RedirectException($this->url->getURl('Checkout', 'address'));
+			}
+
 			throw new SoftRedirectException($method->public, 'payment');
 		}
-
-		$this->language->loadLanguageFile('checkout.php', 'modules'.DS.'checkout');
 
 		$data = [
 			'contents' => $cart->getContents(),
@@ -104,6 +111,132 @@ class Checkout extends Controller {
 
 		$template = $this->getTemplate('pages/checkout.php', $data, 'modules'.DS.'checkout');
 		$this->response->setContent($template->render());
+	}
+
+	public function address() {
+		$cart = new CartContents($this->config, $this->database, $this->request);
+		$module_config = $this->config->moduleConfig('\modules\checkout');
+		$this->language->loadLanguageFile('checkout.php', 'modules'.DS.'checkout');
+
+		// if the cart is empty go to the cart page
+		if ($cart->getItemCount() == 0) {
+			$this->logger->info('Cart is empty');
+			throw new RedirectException('Cart');
+		}
+
+		$country = $this->model->getModel('\core\classes\models\Country');
+		$form = $this->getAddressForm();
+
+		if ($form->validate()) {
+			$billing_address = $this->createAddress($form, 'billing');
+			$shipping_address = $this->createAddress($form, 'shipping');
+
+			$cart->setShippingAddress($shipping_address->getRecord());
+			$cart->setBillingAddress($billing_address->getRecord());
+
+			$method = $this->config->siteConfig()->checkout->payment_methods->{$cart->getPaymentMethod()};
+
+			throw new SoftRedirectException($method->public, 'payment');
+		}
+
+		$data = [
+			'form' => $form,
+			'countries' => $country->getMulti(NULL, ['name' => 'asc']),
+			'contents' => $cart->getContents(),
+			'totals' => $cart->getTotals($this->language),
+			'grand_total' => $cart->getGrandTotal(),
+			'payment_types' => $this->config->siteConfig()->checkout->payment_methods,
+		];
+
+		$template = $this->getTemplate('pages/address.php', $data, 'modules'.DS.'checkout');
+		$this->response->setContent($template->render());
+	}
+
+	protected function createAddress($form, $type) {
+		$model = new Model($this->config, $this->database);
+
+		// The country must exist
+		$country = $model->getModel('\core\classes\models\Country')->get([
+			'id' => $form->getValue($type.'_country')
+		]);
+		if (!$country) {
+			throw new \ErrorException("Invalid country selected in checkout address");
+		}
+
+		// get the state
+		$state = NULL;
+		if ($form->getValue($type.'_state')) {
+			$state = $model->getModel('\core\classes\models\State')->get([
+				'country_id' => $country->id,
+				'name' => $form->getValue($type.'_state'),
+			]);
+			if (!$state) {
+				$state = $model->getModel('\core\classes\models\State')->get([
+					'country_id' => $country->id,
+					'abbrev' => $form->getValue($type.'_state'),
+				]);
+				if (!$state) {
+					try {
+						$state = $model->getModel('\core\classes\models\State');
+						$state->country_id = $country->id;
+						$state->abbrev     = $form->getValue($type.'_state');
+						$state->name       = $form->getValue($type.'_state');
+						$state->insert();
+					}
+					catch (\Exception $ex) {
+						$state = $model->getModel('\core\classes\models\State')->get([
+							'country_id' => $country->id,
+							'name' => $form->getValue($type.'_state'),
+						]);
+						if (!$state) {
+							throw new \ErrorException("Error creating state record: ".$ex);
+						}
+					}
+				}
+			}
+		}
+
+		// get the city
+		$city_name = $form->getValue($type.'_city');
+		$city = $model->getModel('\core\classes\models\City')->get([
+			'country_id' => $country->id,
+			'state_id' => $state ? $state->id : NULL,
+			'name' => $city_name,
+		]);
+		if (!$city) {
+			try {
+				$city = $model->getModel('\core\classes\models\City');
+				$city->country_id = $country->id;
+				$city->state_id   = $state ? $state->id : NULL;
+				$city->name       = $city_name;
+				$city->insert();
+			}
+			catch (\Exception $ex) {
+				$city = $model->getModel('\core\classes\models\City')->get([
+					'country_id' => $country->id,
+					'state_id' => $state ? $state->id : NULL,
+					'name' => $city_name,
+				]);
+				if (!$city) {
+					throw new \ErrorException("Error creating city record: ".$ex);
+				}
+			}
+		}
+
+		// create the address
+		$address = $model->getModel('\core\classes\models\Address');
+		$address->first_name  = $form->getValue($type.'_first_name');
+		$address->last_name   = $form->getValue($type.'_last_name');
+		$address->email       = $form->getValue($type.'_email');
+		$address->phone       = $form->getValue($type.'_phone');
+		$address->line1       = $form->getValue($type.'_address_line1');
+		$address->line2       = $form->getValue($type.'_address_line2');
+		$address->postcode    = $form->getValue($type.'_postcode');
+		$address->city_id     = $city->id;
+		$address->state_id    = $state ? $state->id : NULL;
+		$address->country_id  = $country->id;
+
+		return $address;
 	}
 
 	public function receipt($reference, $status = NULL) {
@@ -167,6 +300,150 @@ class Checkout extends Controller {
 		];
 		$template = $this->getTemplate('pages/receipt.php', $data, 'modules'.DS.'checkout');
 		$this->response->setContent($template->render());
+	}
+
+	protected function getAddressForm() {
+		$inputs = [
+			'billing_first_name' => [
+				'type' => 'string',
+				'min_length' => 2,
+				'max_length' => 128,
+				'required' => TRUE,
+				'message' => $this->language->get('error_first_name')
+			],
+			'billing_last_name' => [
+				'type' => 'string',
+				'min_length' => 2,
+				'max_length' => 128,
+				'required' => TRUE,
+				'message' => $this->language->get('error_last_name')
+			],
+			'billing_phone' => [
+				'type' => 'string',
+				'min_length' => 2,
+				'max_length' => 128,
+				'required' => TRUE,
+				'message' => $this->language->get('error_phone')
+			],
+			'billing_email' => [
+				'type' => 'email',
+				'required' => TRUE,
+				'message' => $this->language->get('error_email')
+			],
+			'billing_address_line1' => [
+				'type' => 'string',
+				'min_length' => 2,
+				'max_length' => 128,
+				'required' => TRUE,
+				'message' => $this->language->get('error_address_line1')
+			],
+			'billing_address_line2' => [
+				'type' => 'string',
+				'min_length' => 2,
+				'max_length' => 128,
+				'required' => FALSE,
+				'message' => $this->language->get('error_address_line2')
+			],
+			'billing_postcode' => [
+				'type' => 'string',
+				'min_length' => 2,
+				'max_length' => 10,
+				'required' => TRUE,
+				'message' => $this->language->get('error_postcode')
+			],
+			'billing_city' => [
+				'type' => 'string',
+				'min_length' => 1,
+				'max_length' => 128,
+				'required' => TRUE,
+				'message' => $this->language->get('error_city')
+			],
+			'billing_state' => [
+				'type' => 'string',
+				'min_length' => 1,
+				'max_length' => 128,
+				'required' => FALSE,
+				'message' => $this->language->get('error_state')
+			],
+			'billing_country' => [
+				'type' => 'integer',
+				'required' => TRUE,
+				'message' => $this->language->get('error_country')
+			],
+			'same_as_billing' => [
+				'type' => 'integer',
+				'required' => FALSE,
+				'message' => $this->language->get('error_same_as_billing')
+			],
+			'shipping_first_name' => [
+				'type' => 'string',
+				'min_length' => 2,
+				'max_length' => 128,
+				'required' => TRUE,
+				'message' => $this->language->get('error_first_name')
+			],
+			'shipping_last_name' => [
+				'type' => 'string',
+				'min_length' => 2,
+				'max_length' => 128,
+				'required' => TRUE,
+				'message' => $this->language->get('error_last_name')
+			],
+			'shipping_phone' => [
+				'type' => 'string',
+				'min_length' => 2,
+				'max_length' => 128,
+				'required' => TRUE,
+				'message' => $this->language->get('error_phone')
+			],
+			'shipping_email' => [
+				'type' => 'email',
+				'required' => TRUE,
+				'message' => $this->language->get('error_email')
+			],
+			'shipping_address_line1' => [
+				'type' => 'string',
+				'min_length' => 2,
+				'max_length' => 128,
+				'required' => TRUE,
+				'message' => $this->language->get('error_address_line1')
+			],
+			'shipping_address_line2' => [
+				'type' => 'string',
+				'min_length' => 2,
+				'max_length' => 128,
+				'required' => FALSE,
+				'message' => $this->language->get('error_address_line2')
+			],
+			'shipping_postcode' => [
+				'type' => 'string',
+				'min_length' => 2,
+				'max_length' => 10,
+				'required' => TRUE,
+				'message' => $this->language->get('error_postcode')
+			],
+			'shipping_city' => [
+				'type' => 'string',
+				'min_length' => 1,
+				'max_length' => 128,
+				'required' => TRUE,
+				'message' => $this->language->get('error_city')
+			],
+			'shipping_state' => [
+				'type' => 'string',
+				'min_length' => 1,
+				'max_length' => 128,
+				'required' => FALSE,
+				'message' => $this->language->get('error_state')
+			],
+			'shipping_country' => [
+				'type' => 'integer',
+				'required' => TRUE,
+				'message' => $this->language->get('error_country')
+			],
+		];
+
+		return new FormValidator($this->request, 'form-checkout-address', $inputs);
 	}
 
 	protected function getPaswordForm($checkout) {
