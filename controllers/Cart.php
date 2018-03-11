@@ -27,6 +27,7 @@ class Cart extends Controller {
 						$type = $matches[1];
 						$id   = $matches[2];
 						$cart->update($type, $id, $quantity);
+						$this->request->addEvent('Update Cart Item', $id, $quantity, $type);
 					}
 				}
 			}
@@ -36,6 +37,7 @@ class Cart extends Controller {
 						$type = $matches[1];
 						$id   = $matches[2];
 						$cart->remove($type, $id);
+						$this->request->addEvent('Remove from Cart', $id, 0, $type);
 					}
 				}
 			}
@@ -87,6 +89,7 @@ class Cart extends Controller {
 
 	public function add($type, $id, $quantity = 1) {
 		$cart = new CartContents($this->config, $this->database, $this->request);
+		$this->request->addEvent('Add to Cart', $id, $quantity, $type);
 		$cart->add($type, $id, $quantity);
 		throw new RedirectException($this->url->getUrl('Cart'));
 	}
@@ -94,12 +97,14 @@ class Cart extends Controller {
 	public function update($type, $id, $quantity) {
 		$cart = new CartContents($this->config, $this->database, $this->request);
 		$cart->update($type, $id, $quantity);
+		$this->request->addEvent('Update Cart Item', $id, $quantity, $type);
 		throw new RedirectException($this->url->getUrl('Cart'));
 	}
 
 	public function remove($type, $id) {
 		$cart = new CartContents($this->config, $this->database, $this->request);
 		$cart->remove($type, $id);
+		$this->request->addEvent('Remove from Cart', $id, 0, $type);
 		throw new RedirectException($this->url->getUrl('Cart'));
 	}
 
