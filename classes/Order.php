@@ -55,7 +55,7 @@ class Order {
 		}
 		// else check if the email already exists, attach it to that account
 		else {
-			if (!$customer) {
+			if (!$customer || !$customer->id) {
 				$exists = $model->getModel('\core\classes\models\Customer')->get([
 					'email' => $billing->email
 				]);
@@ -107,7 +107,7 @@ class Order {
 
 		// create the checkout record
 		$checkout = $model->getModel('\modules\checkout\classes\models\Checkout');
-		$checkout->customer_id              = $customer ? $customer->id : NULL;
+		$checkout->customer_id              = $customer->id;
 		$checkout->status_id                = $status->getStatusId('Pending');
 		$checkout->payment_code             = $payment_code;
 		$checkout->checkout_items_cost      = $this->cart->getCartCostPrice();
