@@ -2,8 +2,13 @@
 
 <?php echo $text_receipt_number; ?>: <?php echo $checkout->getReferenceNumber(); ?>
 
+<?php if ($checkout_note_txt) { ?>
 
 
+<?php echo $checkout_note_txt; ?>
+
+
+<?php } ?>
 <?php echo $text_order_details; ?>
 
 

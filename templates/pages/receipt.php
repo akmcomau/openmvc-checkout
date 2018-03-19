@@ -48,6 +48,9 @@
 			<strong><?php echo $this->language->get('curreny', $this->config->siteConfig()->currency); ?></strong>
 		</div>
 	</div>
+	<?php if ($checkout_note) { ?>
+		<?php echo $checkout_note; ?>
+	<?php } ?>
 	<?php if ($created_customer) { ?>
 		<div class="row">
 			<form id="form-password" class="form-login-register" action="<?php echo $this->url->getUrl('Checkout', 'receipt', [$receipt_number]); ?>" method="post">

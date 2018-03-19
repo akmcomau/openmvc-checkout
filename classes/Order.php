@@ -183,13 +183,15 @@ class Order {
 		return $price * self::getExchangeRate($config, $database);
 	}
 
-	public function sendOrderEmails(Checkout $checkout, Language $language) {
+	public function sendOrderEmails(Checkout $checkout, Language $language, $checkout_note_html = NULL, $checkout_note_txt = NULL) {
 		$customer = $checkout->getCustomer();
 		$data = [
 			'checkout' => $checkout,
 			'customer' => $customer,
 			'shipping' => $checkout->getShippingAddress(),
 			'billing'  => $checkout->getBillingAddress(),
+			'checkout_note_html' => $checkout_note_html,
+			'checkout_note_txt' => $checkout_note_txt,
 		];
 
 		// customer

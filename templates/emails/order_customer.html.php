@@ -11,6 +11,10 @@
 <?php echo $checkout->getReferenceNumber(); ?>
 </h3>
 <br />
+<?php if ($checkout_note_html) { ?>
+<?php echo $checkout_note_html; ?>
+<br />
+<?php } ?>
 <div>
 <table style="width: 100%;"><tr><td>
 <table style="background-color: #FFF;width: 100%;padding: 20px;">
