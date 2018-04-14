@@ -51,7 +51,7 @@
 				<?php } else { ?>
 					<?php foreach ($payment_types as $code => $data) { ?>
 						<div>
-							<label>
+							<label style="width: 150px; text-align: left;">
 								<input type="radio" name="payment_method" value="<?php echo $code; ?>" />
 								<?php echo $data->name; ?>
 							</label>
